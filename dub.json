@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Krillize"
+	],
+	"copyright": "Copyright © 2023, Krillize",
+	"dependencies": {
+		"docopt": ">=0.6.1-b.6 <0.7.0-0"
+	},
+	"description": "Keyboard Layout Analysis Tool",
+	"license": "MIT",
+	"name": "krillyzer"
+}

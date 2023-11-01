@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/krillyzer
+krillyzer.so
+krillyzer.dylib
+krillyzer.dll
+krillyzer.a
+krillyzer.lib
+krillyzer-test-*
+*.exe
+*.o
+*.obj
+*.lst
