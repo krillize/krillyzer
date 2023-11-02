@@ -1,0 +1,17 @@
+name    Colemak DHv
+date    2021 06 28
+format  custom
+
+author  Oatz
+
+main (
+    q w c p b  j l u y ; -
+    a r s t g  m n e i o '
+    z x f d k  v h / . ,  
+)
+
+fingers (
+    0 1 2 3 3  6 6 7 8 8 8
+    0 1 2 3 3  6 6 7 8 9 9
+    0 1 2 3 3  6 6 7 8 9
+)

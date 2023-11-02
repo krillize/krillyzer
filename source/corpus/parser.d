@@ -1,4 +1,4 @@
-module corpus.parsing;
+module corpus.parser;
 
 import std;
 

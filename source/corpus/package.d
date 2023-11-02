@@ -1,4 +1,4 @@
 module corpus;
 
-public import corpus.parsing;
+public import corpus.parser;
 public import corpus.frequencies;

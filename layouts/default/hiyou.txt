@@ -1,0 +1,11 @@
+name    HiYou
+date    2022 12 15
+format  standard
+
+author  RusDoomer
+
+main (
+    k y o u '  f d l b w
+    h i e a .  g s t n r
+    j q ; , x  v c m p z
+)
