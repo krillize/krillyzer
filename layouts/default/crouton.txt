@@ -7,7 +7,7 @@ author  Flarefin
 main (
     g l d p q  z k o u ,
     c r t n v  y h a e i
-    w j m b      x ' ; .
+    w j m b ~  ~ x ' ; .
                  f s   
 )
 
