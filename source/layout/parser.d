@@ -39,7 +39,7 @@ void getLayout(string name) {
         }
 
         if (inList) {
-            if (tokens[0] == ")") {
+            if (tokens[0] == ")" && tokens.length == 1) {
                 inList = false;
                 data[curr] = data[curr].strip;
             } else {
@@ -51,6 +51,11 @@ void getLayout(string name) {
                 return;
             }   
 
+            if (tokens.length < 2) {
+                "Error, missing value after token \"%s\" in %s".writefln(tokens[0], name);
+                return;
+            }
+
             if (tokens[1] == "(") {
                 inList = true;
                 curr = tokens[0];
@@ -61,7 +66,7 @@ void getLayout(string name) {
     }
 
     if (inList) {
-        "Error, list for %s definition was never closed".writefln(name);
+        "Error, list in %s definition was never closed".writefln(name);
         return;
     }
 
