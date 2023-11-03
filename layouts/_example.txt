@@ -26,6 +26,12 @@ author  Christopher Latham Sholes
 # source should be a link to the layout's site
 source  https://github.com/lathamsholes/qwerty/
 
+# an optional description can also be supplied
+desc (
+    the layout that most people use
+    it's not very good
+)
+
 # the main key declares where the leters are in the layout
 # spaces will be collapsed to one space during parsing
 # newlines denote rows
