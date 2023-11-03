@@ -27,7 +27,7 @@ int[string] skipgrams(string text, int n) {
 
 auto getCorpora() {
     return "corpora".dirEntries("*.txt", SpanMode.depth)
-        .map!(x => x[8 .. $-4]);
+        .map!(x => x[8 .. $-4]).array;
 }
 
 void setCorpus(string corpus, bool file = true) {

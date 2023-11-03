@@ -15,9 +15,9 @@ class ParserException : Exception {
     }
 }
 
-auto getLayouts() {
+string[] getLayouts() {
     return "layouts".dirEntries("*.txt", SpanMode.depth)
-        .map!(x => x.to!string.splitter("/").array[$ - 1][0 .. $ - 4]);
+        .map!(x => x.to!string.splitter("/").array[$ - 1][0 .. $ - 4]).array;
 }
 
 Layout getLayout(string name) {

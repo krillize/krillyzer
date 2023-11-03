@@ -8,8 +8,8 @@ immutable string doc = "
 krillyzer
 
 Usage:
+  krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
-  krillyzer list (layouts | corpora)
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer view <layout>
   krillyzer -h | --help
@@ -25,16 +25,28 @@ void main(string[] args) {
 		);
 	}
 
-	if (cmds["list"].isTrue && cmds["corpora"].isTrue) {
-		writeln("List of Corpora:");
-		getCorpora.each!(x => "  %s".writefln(x));
-	}
+	if (cmds["list"].isTrue) {
+		string msg;
+		string[] items;
 
-	if (cmds["list"].isTrue && cmds["layouts"].isTrue) {
-		writeln("List of Layouts:");
-		auto layouts = getLayouts.array;
-		layouts.sort;
-		layouts.each!(x => "  %s".writefln(x));
+		if (cmds["corpora"].isTrue) {
+			items = getCorpora;
+			msg = "List of Corpora:";
+		}
+
+		if (cmds["layouts"].isTrue) {
+			items = getLayouts;
+			msg = "List of Layouts:";
+		}
+
+		if (cmds["--contains"].isString) {
+			string str = cmds["--contains"].toString;
+			items = items.filter!(x => x.canFind(str)).array;
+		}
+
+		writeln(msg);
+		items.sort;
+		items.each!(x => "  %s".writefln(x));
 	}
 
 	if (cmds["freq"].isTrue) {
