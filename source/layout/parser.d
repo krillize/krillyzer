@@ -15,22 +15,16 @@ class ParserException : Exception {
     }
 }
 
-void getLayout(string name) {
+Layout getLayout(string name) {
     auto layouts = "layouts".dirEntries("*%s.txt".format(name), SpanMode.depth).array;
 
-    if (layouts.empty) {
-        "layout \"%s\" not found...".writefln(name);
-        return;
-    }
+    enforce!ParserException(!layouts.empty, 
+        "layout \"%s\" not found...".format(name)
+    );
 
     auto file = layouts[0].File;
 
-    string[string] data = [
-        "date":   "0000 01 01",
-        "author": "",
-        "source": "",
-        "desc":   "",
-    ];
+    string[string] data;
 
     bool inList = false;
     string curr = "";
@@ -122,13 +116,43 @@ void getLayout(string name) {
         "mismatch in tokens between main and shift keys"
     );
 
-    // data["name"].writeln;
-    // data["main"].splitter("\n").each!(x => "  %s".writefln(x));
+    Layout layout;
 
-    // data.JSONValue.to!string.writeln;
+    layout.date    = data.get("date", "0001-01-01");
+    layout.authors = data.get("author", "??").splitter("\n").array;
+    layout.source  = data.get("source", "??");
+    layout.desc    = data.get("desc", "??");
 
-    foreach (k, v; data) {
-        "%s\n%s\n".writefln(k, v);
+    layout.name = data["name"];
+    layout.format = data["format"];
+
+    int row;
+    int col;
+
+    Position[dchar] keys;
+    foreach (ch, sh, finger; zip(data["main"], data["shift"], data["fingers"])) {
+        if (ch == '\n') {
+            row++;
+            col = 0;
+            continue;
+        }
+
+        if (ch == ' ') {
+            col++;
+            continue;
+        }
+
+        Position pos = Position(
+            row,
+            col,
+            (finger - '0').to!Finger,
+            ((finger - '0') > 4).to!Hand
+        );
+
+        keys[ch] = pos;
+        keys[sh] = pos;
     }
-}
 
+    layout.keys = keys;
+    return layout;
+}

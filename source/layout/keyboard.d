@@ -2,14 +2,15 @@ module layout.keyboard;
 
 import std;
 
-enum {LP, LR, LM, LI, LT, RT, RI, RM, RR, RP}
-enum {Left, Right}
+enum Finger {LP, LR, LM, LI, LT, RT, RI, RM, RR, RP}
+enum Hand   {Left, Right}
+enum Row    {top, home, bottom}
 
 struct Position {
     int row;
     int col;
-    int finger;
-    int hand;
+    Finger finger;
+    Hand hand;
 }
 
 struct Layout {
@@ -22,5 +23,5 @@ struct Layout {
 
     string desc;
     
-    Position[char] keys;
+    Position[dchar] keys;
 }
