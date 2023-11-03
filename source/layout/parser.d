@@ -2,6 +2,8 @@ module layout.parser;
 
 import std;
 
+import layout.keyboard;
+
 immutable defs = [
     "name", "date", "format", "author", "fingers", 
     "source", "desc", "main", "shift"
@@ -80,6 +82,49 @@ void getLayout(string name) {
         return;
     }
 
-    data["name"].writeln;
-    data["main"].splitter("\n").each!(x => "  %s".writefln(x));
+    switch (data["format"]) {
+        case "standard":
+            data["fingers"] = (
+                "0 1 2 3 3 6 6 7 8 9\n" ~
+                "0 1 2 3 3 6 6 7 8 9\n" ~
+                "0 1 2 3 3 6 6 7 8 9"
+            );
+            break;
+        case "angle":
+            data["fingers"] = (
+                "0 1 2 3 3 6 6 7 8 9\n" ~
+                "0 1 2 3 3 6 6 7 8 9\n" ~
+                "1 2 3 3 3 6 6 7 8 9"
+            );
+            break;
+        case "custom":
+            break;
+        default:
+            "Error, format \"%s\" not valid in %s".writefln(data["format"], name);
+            return;
+    }
+
+    if (!("fingers" in data)) {
+        "Error, no finger definition in %s".writefln(name);
+        return;
+    }
+
+    if (!("shift" in data)) {
+        auto shifter = zip(
+            "abcdefghijklmnopqrstuvwxyz-=[],.;/'",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ_+{}<>:?\"",
+        ).assocArray;
+
+        data["shift"] = data["main"].map!(x => shifter.get(x, x)).to!string;
+    }
+
+    // data["name"].writeln;
+    // data["main"].splitter("\n").each!(x => "  %s".writefln(x));
+
+    // data.JSONValue.to!string.writeln;
+
+    foreach (k, v; data) {
+        "%s\n%s\n".writefln(k, v);
+    }
 }
+
