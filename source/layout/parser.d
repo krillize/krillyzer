@@ -146,6 +146,10 @@ Layout getLayout(string name) {
             continue;
         }
 
+        if (ch == '~') {
+            continue;
+        }
+
         Position pos = Position(
             row,
             col,
