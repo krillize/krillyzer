@@ -9,6 +9,12 @@ immutable defs = [
     "source", "desc", "main", "shift"
 ];
 
+class ParserException : Exception {
+    this(string msg, string file = __FILE__, size_t line = __LINE__) {
+        super(msg, file, line);
+    }
+}
+
 void getLayout(string name) {
     auto layouts = "layouts".dirEntries("*%s.txt".format(name), SpanMode.depth).array;
 
@@ -47,16 +53,14 @@ void getLayout(string name) {
             } else {
                 data[curr] ~= tokens.join(" ") ~ "\n";
             }
-        } else {
-            if (!defs.canFind(tokens[0])) {
-                "Error, unexpected token \"%s\" for %s".writefln(tokens[0], name);
-                return;
-            }   
+        } else { 
+            enforce!ParserException(defs.canFind(tokens[0]),
+                "unexpected key \"%s\"".format(tokens[0]) 
+            );
 
-            if (tokens.length < 2) {
-                "Error, missing value after token \"%s\" in %s".writefln(tokens[0], name);
-                return;
-            }
+            enforce!ParserException(tokens.length > 1,
+                "missing value for key \"%s\"".format(tokens[0])
+            );
 
             if (tokens[1] == "(") {
                 inList = true;
@@ -67,47 +71,34 @@ void getLayout(string name) {
         }
     }
 
-    if (inList) {
-        "Error, list in %s definition was never closed".writefln(name);
-        return;
-    }
+    enforce!ParserException(!inList, "list was never closed");
 
     auto missing = ["main", "format", "name"].filter!(x => !(x in data));
-    if (!missing.empty) {
-        "Error, missing definition(s) for %s: %s".writefln(
-            name, 
-            missing.join(", ")
+    enforce!ParserException(missing.empty, 
+        "missing keys %s".format(missing.join(", "))
+    );
+
+    enforce!ParserException(["standard", "angle", "custom"].canFind(data["format"]), 
+        "format value \"%s\" not recognized".format(data["format"])
+    );
+
+    if (data["format"] == "standard") {
+        data["fingers"] = (
+            "0 1 2 3 3 6 6 7 8 9\n" ~
+            "0 1 2 3 3 6 6 7 8 9\n" ~
+            "0 1 2 3 3 6 6 7 8 9"
         );
-
-        return;
+    }
+    
+    if (data["format"] == "angle") {
+        data["fingers"] = (
+            "0 1 2 3 3 6 6 7 8 9\n" ~
+            "0 1 2 3 3 6 6 7 8 9\n" ~
+            "1 2 3 3 3 6 6 7 8 9"
+        );
     }
 
-    switch (data["format"]) {
-        case "standard":
-            data["fingers"] = (
-                "0 1 2 3 3 6 6 7 8 9\n" ~
-                "0 1 2 3 3 6 6 7 8 9\n" ~
-                "0 1 2 3 3 6 6 7 8 9"
-            );
-            break;
-        case "angle":
-            data["fingers"] = (
-                "0 1 2 3 3 6 6 7 8 9\n" ~
-                "0 1 2 3 3 6 6 7 8 9\n" ~
-                "1 2 3 3 3 6 6 7 8 9"
-            );
-            break;
-        case "custom":
-            break;
-        default:
-            "Error, format \"%s\" not valid in %s".writefln(data["format"], name);
-            return;
-    }
-
-    if (!("fingers" in data)) {
-        "Error, no finger definition in %s".writefln(name);
-        return;
-    }
+    enforce!ParserException("fingers" in data, "key \"fingers\" not found");
 
     if (!("shift" in data)) {
         auto shifter = zip(

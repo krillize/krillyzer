@@ -38,7 +38,11 @@ void main(string[] args) {
 	}
 
 	if (cmds["view"].isTrue) {
-		getLayout(cmds["<layout>"].toString);
+		try {
+			getLayout(cmds["<layout>"].toString);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+		}
 	}
 	
     // writeln(cmds);
