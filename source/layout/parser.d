@@ -82,23 +82,32 @@ void getLayout(string name) {
         "format value \"%s\" not recognized".format(data["format"])
     );
 
+    auto rows = data["main"].splitter("\n").map!(x => x.splitter.walkLength).array;
+
+    enforce!ParserException(all!"a >= 10"(rows) || data["format"] == "custom",
+        "format %s doesnt support row lengths less than 10".format(data["format"])
+    );
+
     if (data["format"] == "standard") {
         data["fingers"] = (
-            "0 1 2 3 3 6 6 7 8 9\n" ~
-            "0 1 2 3 3 6 6 7 8 9\n" ~
-            "0 1 2 3 3 6 6 7 8 9"
+            "0 1 2 3 3 6 6 7 8 9" ~ " 9".repeat(rows[0] - 10).join ~ "\n" ~
+            "0 1 2 3 3 6 6 7 8 9" ~ " 9".repeat(rows[1] - 10).join ~ "\n" ~
+            "0 1 2 3 3 6 6 7 8 9" ~ " 9".repeat(rows[2] - 10).join
         );
     }
     
     if (data["format"] == "angle") {
         data["fingers"] = (
-            "0 1 2 3 3 6 6 7 8 9\n" ~
-            "0 1 2 3 3 6 6 7 8 9\n" ~
-            "1 2 3 3 3 6 6 7 8 9"
+            "0 1 2 3 3 6 6 7 8 9" ~ " 9".repeat(rows[0] - 10).join ~ "\n" ~ 
+            "0 1 2 3 3 6 6 7 8 9" ~ " 9".repeat(rows[1] - 10).join ~ "\n" ~ 
+            "1 2 3 3 3 6 6 7 8 9" ~ " 9".repeat(rows[2] - 10).join
         );
     }
 
     enforce!ParserException("fingers" in data, "key \"fingers\" not found");
+    enforce!ParserException(data["main"].length == data["fingers"].length,
+        "mismatch in tokens between main and fingers keys"
+    );
 
     if (!("shift" in data)) {
         auto shifter = zip(
@@ -108,6 +117,10 @@ void getLayout(string name) {
 
         data["shift"] = data["main"].map!(x => shifter.get(x, x)).to!string;
     }
+
+    enforce!ParserException(data["main"].length == data["shift"].length,
+        "mismatch in tokens between main and shift keys"
+    );
 
     // data["name"].writeln;
     // data["main"].splitter("\n").each!(x => "  %s".writefln(x));
