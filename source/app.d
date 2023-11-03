@@ -9,7 +9,7 @@ krillyzer
 
 Usage:
   krillyzer load <corpus> [--file]
-  krillyzer list
+  krillyzer list (layouts | corpora)
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer view <layout>
   krillyzer -h | --help
@@ -25,9 +25,16 @@ void main(string[] args) {
 		);
 	}
 
-	if (cmds["list"].isTrue) {
+	if (cmds["list"].isTrue && cmds["corpora"].isTrue) {
 		writeln("List of Corpora:");
 		getCorpora.each!(x => "  %s".writefln(x));
+	}
+
+	if (cmds["list"].isTrue && cmds["layouts"].isTrue) {
+		writeln("List of Layouts:");
+		auto layouts = getLayouts.array;
+		layouts.sort;
+		layouts.each!(x => "  %s".writefln(x));
 	}
 
 	if (cmds["freq"].isTrue) {
@@ -39,7 +46,8 @@ void main(string[] args) {
 
 	if (cmds["view"].isTrue) {
 		try {
-			getLayout(cmds["<layout>"].toString);
+			auto layout = getLayout(cmds["<layout>"].toString);
+			layout.writeln;
 		} catch (ParserException e) {
 			"Error in layout file: %s".writefln(e.msg);
 		}
