@@ -78,6 +78,10 @@ Layout getLayout(string name) {
 
     auto rows = data["main"].splitter("\n").map!(x => x.splitter.walkLength).array;
 
+    enforce!ParserException(rows.length == 3 || data["format"] == "custom",
+        "format %s expects 3 rows (found %s)".format(data["format"], rows.length)
+    );
+
     enforce!ParserException(all!"a >= 10"(rows) || data["format"] == "custom",
         "format %s doesnt support row lengths less than 10".format(data["format"])
     );
