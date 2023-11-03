@@ -1,0 +1,61 @@
+# this is an example layout config file
+# comments start with a # character followed by space
+# comments must be on their own line
+
+# the first token on a line will always be the KEY, and
+# the remaining tokens on that line will be the string VALUE
+# name, format, and main keys are required, everything else is optional
+name    QWERTY
+
+# dates are specified as YEAR MONTH DAY
+date    1878 01 01
+
+# format must be either standard, angle, or custom
+# if set to custom, then the key "fingers" must be supplied
+format  custom
+
+# the author key can be defined like this
+author  Christopher Latham Sholes
+
+# or it can be defined like this for multiple authors
+# author (
+#     Christopher Latham Sholes
+#     Other Person
+# )
+
+# source should be a link to the layout's site
+source  https://github.com/lathamsholes/qwerty/
+
+# the main key declares where the leters are in the layout
+# spaces will be collapsed to one space during parsing
+# newlines denote rows
+main (
+    q w e r t  y u i o p
+    a s d f g  h j k l ; '
+    z x c v b  n m , . /
+)
+
+# the shift key defines how the shift layer looks
+# the number of tokens here must be the same as
+# the number of tokens in main
+# if left out, the shift layer will be auto generated
+shift (
+    Q W E R T  Y U I O P
+    A S D F G  H J K L : "
+    Z X C V B  N M < > ?
+)
+
+# if the format is set to custom, you must supply this key
+# otherwise, you can leave it, and it will be auto generated
+# the number of tokens must match with main, same as the shift layer
+# the numbers represent all 10 fingers from left to right:
+#   0 = left pinky      5 = right thumb  
+#   1 = left ring       6 = right index 
+#   2 = left middle     7 = right middle 
+#   3 = left index      8 = right ring 
+#   4 = left thumb      9 = right pinky 
+fingers (
+    0 1 2 3 3  6 6 7 8 9
+    0 1 2 3 3  6 6 7 8 9 9
+    0 1 2 3 3  6 6 7 8 9
+)
