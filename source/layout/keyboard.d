@@ -22,6 +22,8 @@ struct Layout {
     string source;
 
     string desc;
+
+    string main;
     
     Position[dchar] keys;
 }

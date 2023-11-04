@@ -134,6 +134,7 @@ Layout getLayout(string name) {
 
     layout.name = data["name"];
     layout.format = data["format"];
+    layout.main = data["main"];
 
     int row;
     int col;
