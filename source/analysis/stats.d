@@ -18,3 +18,11 @@ bool isLSB(Position[] pos) {
         pos.distHorizontal >= 2
     );
 }
+
+double distSFB(Position[] pos) {
+    return pos.isSFB * pos.distance;
+}
+
+double distLSB(Position[] pos) {
+    return pos.isLSB * pos.distance;
+}

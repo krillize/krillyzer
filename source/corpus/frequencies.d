@@ -2,6 +2,8 @@ module corpus.frequencies;
 
 import std;
 
+import corpus.parser;
+
 double freq(string ngram, int[string] bigrams) {
     return cast(float) bigrams.get(ngram, 0) / bigrams.values.sum;
 }
@@ -13,25 +15,9 @@ void showFreq(string ngram, bool ignoreCase = false) {
     }
 
     string margn = ngram.dup.reverse;
-    auto json = "data.json".readText.parseJSON;
 
-    int[string] bigrams;
-    foreach (string k, v; json["bigrams"]) {
-        if (ignoreCase) {
-            bigrams[k.toLower] += v.get!int;
-        } else {
-            bigrams[k] += v.get!int;
-        }
-    }
-
-    int[string] skipgrams;
-    foreach (string k, v; json["skipgrams"]) {
-        if (ignoreCase) {
-            skipgrams[k.toLower] += v.get!int;
-        } else {
-            skipgrams[k] += v.get!int;
-        }
-    }
+    auto bigrams = getBigrams(ignoreCase);
+    auto skipgrams = getSkipgrams(ignoreCase);
 
     double freqNorm = freq(ngram, bigrams);
     double freqRevr = freq(margn, bigrams);

@@ -56,3 +56,33 @@ void setCorpus(string corpus, bool file = true) {
 
     writeln("Done.");
 }
+
+int[string] getBigrams(bool ignoreCase = false) {
+    auto json = "data.json".readText.parseJSON;
+
+    int[string] bigrams;
+    foreach (string k, v; json["bigrams"]) {
+        if (ignoreCase) {
+            bigrams[k.toLower] += v.get!int;
+        } else {
+            bigrams[k] += v.get!int;
+        }
+    }
+
+    return bigrams;
+}
+
+int[string] getSkipgrams(bool ignoreCase = false) {
+    auto json = "data.json".readText.parseJSON;
+
+    int[string] skipgrams;
+    foreach (string k, v; json["skipgrams"]) {
+        if (ignoreCase) {
+            skipgrams[k.toLower] += v.get!int;
+        } else {
+            skipgrams[k] += v.get!int;
+        }
+    }
+
+    return skipgrams;
+}
