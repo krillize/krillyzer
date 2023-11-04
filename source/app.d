@@ -11,7 +11,7 @@ krillyzer
 Usage:
   krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
-  krillyzer sfb <layout> [--dist]
+  krillyzer sfb <layout> [--dist] [--ignoreCase] [--amount=<int>]
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer debug <layout> <bigram>
   krillyzer -h | --help
@@ -60,7 +60,7 @@ void main(string[] args) {
 
 	if (cmds["sfb"].isTrue) {
 		auto layout = getLayout(cmds["<layout>"].toString);
-		auto bigrams = getBigrams();
+		auto bigrams = getBigrams(cmds["--ignoreCase"].isTrue);
 
 		int total;
 		double[int] raw;
@@ -100,14 +100,21 @@ void main(string[] args) {
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 		
-		"\nSFB %.2f%%".writefln(raw.values.sum / total * 100);
-		"  Pinky  %.2f%%".writefln((raw[0] + raw[6]) / total * 100);
-		"  Ring   %.2f%%".writefln((raw[1] + raw[7]) / total * 100);
-		"  Middle %.2f%%".writefln((raw[2] + raw[8]) / total * 100);
-		"  Index  %.2f%%".writefln((raw[3] + raw[9]) / total * 100);
+		"\nSFB %.3f%%".writefln(raw.values.sum / total * 100);
+		"  Pinky  %.3f%%".writefln((raw[0] + raw[6]) / total * 100);
+		"  Ring   %.3f%%".writefln((raw[1] + raw[7]) / total * 100);
+		"  Middle %.3f%%".writefln((raw[2] + raw[8]) / total * 100);
+		"  Index  %.3f%%".writefln((raw[3] + raw[9]) / total * 100);
+
+		int amount = 16;
+		
+		if (cmds["--amount"].isString) {
+			string str = cmds["--amount"].toString;
+			amount = str.parse!int;
+		}
 
 		writeln("\nWorst");
-		foreach (row; sfbs.take(16).chunks(4)) {
+		foreach (row; sfbs.take(amount).chunks(4)) {
 			foreach (gram; row) {
 				auto pos = gram.map!(x => layout.keys[x]).array;
 				double count = bigrams[gram].to!float / total * 100;
@@ -116,7 +123,7 @@ void main(string[] args) {
 					count *= pos.distance;
 				}
 
-				"  %s %-6s".writef(gram, "%.2f%%".format(count));
+				"  %s %-7s".writef(gram, "%.3f%%".format(count));
 			}
 			writeln;
 		}
