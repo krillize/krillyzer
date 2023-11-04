@@ -11,7 +11,7 @@ krillyzer
 Usage:
   krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
-  krillyzer sfb <layout> [--dist] [--ignoreCase] [--amount=<int>]
+  krillyzer sfb <layout> [--dist] [--pairs] [--ignoreCase] [--amount=<int>]
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer debug <layout> <bigram>
   krillyzer -h | --help
@@ -60,7 +60,10 @@ void main(string[] args) {
 
 	if (cmds["sfb"].isTrue) {
 		auto layout = getLayout(cmds["<layout>"].toString);
-		auto bigrams = getBigrams(cmds["--ignoreCase"].isTrue);
+		auto bigrams = getBigrams(
+			cmds["--ignoreCase"].isTrue, 
+			cmds["--pairs"].isTrue
+		);
 
 		int total;
 		double[int] raw;

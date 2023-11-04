@@ -57,16 +57,14 @@ void setCorpus(string corpus, bool file = true) {
     writeln("Done.");
 }
 
-int[string] getBigrams(bool ignoreCase = false) {
+int[string] getBigrams(bool ignoreCase = false, bool pairs = false) {
     auto json = "data.json".readText.parseJSON;
 
     int[string] bigrams;
     foreach (string k, v; json["bigrams"]) {
-        if (ignoreCase) {
-            bigrams[k.toLower] += v.get!int;
-        } else {
-            bigrams[k] += v.get!int;
-        }
+        string gram = ignoreCase ? k.toLower : k;
+        gram = pairs ? gram.array.sort.to!string : gram;
+        bigrams[gram] += v.get!int;
     }
 
     return bigrams;
