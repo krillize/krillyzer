@@ -108,9 +108,16 @@ void main(string[] args) {
 
 		writeln("\nWorst");
 		foreach (row; sfbs.take(16).chunks(4)) {
-			row.each!(x => 
-				"  %s %-6s".writef(x, "%.2f%%".format(bigrams[x].to!float / total * 100))
-			);
+			foreach (gram; row) {
+				auto pos = gram.map!(x => layout.keys[x]).array;
+				double count = bigrams[gram].to!float / total * 100;
+
+				if (cmds["--dist"].isTrue) {
+					count *= pos.distance;
+				}
+
+				"  %s %-6s".writef(gram, "%.2f%%".format(count));
+			}
 			writeln;
 		}
 	}
