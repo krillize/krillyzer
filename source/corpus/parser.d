@@ -5,10 +5,13 @@ import std;
 int[string] ngrams(string text, int n) {
     int[string] counts;
 
-    text.slide(n)
-        .map!(x => x.to!string)
-        .filter!(x => !x.canFind(" "))
-        .each!(x => counts[x]++);
+    foreach (item; text.slide(n)) {
+        if (item.canFind(" ")) {
+            continue;
+        }
+
+        counts[item.to!string]++;
+    }
 
     return counts;
 }
@@ -16,11 +19,15 @@ int[string] ngrams(string text, int n) {
 int[string] skipgrams(string text, int n) {
     int[string] counts;
 
-    text.slide(2 + n)
-        .map!(x => x.to!string)
-        .map!(x => x[0 .. 1] ~ x[$ - 1 .. $])
-        .filter!(x => !x.canFind(" "))
-        .each!(x => counts[x]++);
+    foreach (item; text.slide(2 + n)) {
+        auto gram = item.array;
+        
+        if (gram[0] == ' ' || gram[$ - 1] == ' ') {
+            continue;
+        }
+
+        counts[[gram[0], gram[$ - 1]].to!string]++;
+    }
 
     return counts;
 }
@@ -45,7 +52,7 @@ void setCorpus(string corpus, bool file = true) {
     [
         "bigrams":   text.ngrams(2),
         "skipgrams": text.skipgrams(1),
-    ].JSONValue.to!string.toFile("data.json");
+    ].JSONValue.toPrettyString.toFile("data.json");
 
     writeln("Done.");
 }
