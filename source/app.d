@@ -135,9 +135,37 @@ void main(string[] args) {
 	if (cmds["debug"].isTrue) {
 		try {
 			auto layout = getLayout(cmds["<layout>"].toString);
+			auto json = "data.json".readText.parseJSON;
 
 			string gram = cmds["<bigram>"].toString;
 			auto pos = gram.map!(x => layout.keys[x]).array;
+
+			double bigram = (
+				(
+					json["bigrams"][gram].get!double +
+					json["bigrams"][gram.dup.reverse].get!double
+				)/ 
+				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+				100
+			);
+
+			double skipgram = (
+				(
+					json["skipgrams"][gram].get!double +
+					json["skipgrams"][gram.dup.reverse].get!double
+				)/ 
+				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+				100
+			);
+
+			double speedgram = (
+				(
+					json["speedgrams"][gram].get!double +
+					json["speedgrams"][gram.dup.reverse].get!double
+				)/ 
+				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+				100
+			);
 
 			"%s (%s)".writefln(layout.name, layout.format);
 			layout.main.map!(
@@ -148,6 +176,11 @@ void main(string[] args) {
 
 			"%s %s".writefln(gram[0], pos[0]);
 			"%s %s".writefln(gram[1], pos[1]);
+
+			writeln("\ncorpus");
+			"  bigram     %.3f%%".writefln(bigram);
+			"  skipgram   %.3f%%".writefln(skipgram);
+			"  speedgram  %.3f%%".writefln(speedgram);
 
 			writeln("\nflags");
 			"  repeat      %2d".writefln(pos.isRepeat);
