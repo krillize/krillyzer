@@ -65,7 +65,7 @@ void main(string[] args) {
 			cmds["--pairs"].isTrue
 		);
 
-		int total;
+		double total = 0;
 		double[int] raw;
 
 		string[] sfbs; 

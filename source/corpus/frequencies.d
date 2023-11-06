@@ -4,7 +4,7 @@ import std;
 
 import corpus.parser;
 
-double freq(string ngram, int[string] bigrams) {
+double freq(string ngram, double[string] bigrams) {
     return cast(float) bigrams.get(ngram, 0) / bigrams.values.sum;
 }
 

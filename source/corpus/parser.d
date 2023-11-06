@@ -2,36 +2,6 @@ module corpus.parser;
 
 import std;
 
-int[string] ngrams(string text, int n) {
-    int[string] counts;
-
-    foreach (item; text.slide(n)) {
-        if (item.canFind(" ")) {
-            continue;
-        }
-
-        counts[item.to!string]++;
-    }
-
-    return counts;
-}
-
-int[string] skipgrams(string text, int n) {
-    int[string] counts;
-
-    foreach (item; text.slide(2 + n)) {
-        auto gram = item.array;
-        
-        if (gram[0] == ' ' || gram[$ - 1] == ' ') {
-            continue;
-        }
-
-        counts[[gram[0], gram[$ - 1]].to!string]++;
-    }
-
-    return counts;
-}
-
 auto getCorpora() {
     return "corpora".dirEntries("*.txt", SpanMode.depth)
         .map!(x => x[8 .. $-4]).array;
@@ -47,38 +17,67 @@ void setCorpus(string corpus, bool file = true) {
 
     writeln("Processing data...");
 
-    string text = path.readText;
+    dchar[] text = path.readText.array;
+
+    double[string] bigrams;
+    double[string] skipgrams;
+    double[string] speedgrams;
+
+    foreach (i; 0 .. text.length) {
+        foreach (j; 0 .. 4) {
+            if (i + j + 2 > text.length) {
+                break;
+            }
+
+            string gram = [text[i], text[i + j + 1]].to!string;
+
+            if (gram.canFind(' ')) {
+                continue;
+            }
+
+            if (j == 0) {
+                bigrams[gram]++;
+            }
+
+            if (j == 1) {
+                skipgrams[gram]++;
+            }
+
+            speedgrams[gram] += 1.0 / 2.5.pow(j);
+        }
+    }
 
     [
-        "bigrams":   text.ngrams(2),
-        "skipgrams": text.skipgrams(1),
+        "bigrams":    bigrams,
+        "skipgrams":  skipgrams,
+        "speedgrams": speedgrams,
     ].JSONValue.toPrettyString.toFile("data.json");
 
     writeln("Done.");
 }
 
-int[string] getBigrams(bool ignoreCase = false, bool pairs = false) {
+double[string] getBigrams(bool ignoreCase = false, bool pairs = false) {
     auto json = "data.json".readText.parseJSON;
 
-    int[string] bigrams;
+    double[string] bigrams;
     foreach (string k, v; json["bigrams"]) {
         string gram = ignoreCase ? k.toLower : k;
         gram = pairs ? gram.array.sort.to!string : gram;
-        bigrams[gram] += v.get!int;
+        bigrams[gram] += v.get!double;
     }
 
     return bigrams;
 }
 
-int[string] getSkipgrams(bool ignoreCase = false) {
+double[string] getSkipgrams(bool ignoreCase = false) {
     auto json = "data.json".readText.parseJSON;
 
-    int[string] skipgrams;
+    double[string] skipgrams;
     foreach (string k, v; json["skipgrams"]) {
         if (ignoreCase) {
-            skipgrams[k.toLower] += v.get!int;
+            skipgrams[k.toLower] += v.get!double;
         } else {
-            skipgrams[k] += v.get!int;
+            skipgrams[k] += v.get!double;
         }
     }
 
