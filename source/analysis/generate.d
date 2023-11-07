@@ -35,9 +35,40 @@ double scoreLayout(Layout layout, JSONValue json) {
 void generate() {
     auto layout = getLayout("qwerty");
 	auto json = "data.json".readText.parseJSON;
+	auto letters = layout.main.splitter.join;
 
-    double score = scoreLayout(layout, json);
+    double best = scoreLayout(layout, json);
 
-    layout.name.writeln;
-	layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+	string[] combos;
+	foreach (i; 0 .. letters.length) {
+			foreach (j; i + 1 .. letters.length) {
+				combos ~= [letters[i], letters[j]];
+			}
+	}
+
+	bool searching = true;
+	while (searching) {
+		searching = false;
+		combos.randomShuffle;
+
+		foreach (combo; combos) {
+			dchar a = combo[0];
+			dchar b = combo[1];
+			
+			layout.swap(a, b);
+			auto score = scoreLayout(layout, json);
+
+			if (score < best) {
+				searching = true;
+				best = score;
+				break;
+			}
+
+			layout.swap(a, b);			
+		}
+	}
+
+	layout.name.writeln;
+	layout.main.writeln;
+	"\n%s".writefln(best);
 }
