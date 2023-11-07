@@ -19,11 +19,14 @@ void setCorpus(string corpus, bool file = true) {
 
     dchar[] text = path.readText.array;
 
+    double[string] monograms;
     double[string] bigrams;
     double[string] skipgrams;
     double[string] speedgrams;
 
     foreach (i; 0 .. text.length) {
+        monograms[text[i].to!string]++;
+
         foreach (j; 0 .. 4) {
             if (i + j + 2 > text.length) {
                 break;
@@ -48,6 +51,7 @@ void setCorpus(string corpus, bool file = true) {
     }
 
     [
+        "monograms":  monograms,
         "bigrams":    bigrams,
         "skipgrams":  skipgrams,
         "speedgrams": speedgrams,

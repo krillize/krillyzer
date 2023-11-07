@@ -24,8 +24,8 @@ double scoreLayout(Layout layout, JSONValue json) {
 
 		auto pos = k.map!(x => layout.keys[x]).array;
 
-		if (pos.isSFB) {
-			count += v * pos.distance;
+		if (pos.sameFinger) {
+			count += v * (pos.distance + 0.1);
 		}
 	}
 
@@ -68,7 +68,6 @@ void generate() {
 		}
 	}
 
-	layout.name.writeln;
 	layout.main.writeln;
 	"\n%s".writefln(best);
 }

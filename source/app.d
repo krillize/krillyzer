@@ -13,6 +13,7 @@ Usage:
   krillyzer load <corpus> [--file]
   krillyzer gen
   krillyzer rank
+  krillyzer use <layout>
   krillyzer sfb <layout> [--dist] [--pairs] [--ignoreCase] [--amount=<int>]
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer debug <layout> <bigram>
@@ -62,6 +63,50 @@ void main(string[] args) {
 
 	if (cmds["gen"].isTrue) {
 		generate();
+	}
+
+	if (cmds["use"].isTrue) {
+		auto layout = getLayout(cmds["<layout>"].toString);
+		auto monograms = "data.json".readText.parseJSON["monograms"];
+
+		double total = 0;
+		double[int] raw;
+
+		foreach (e; monograms.object.byKeyValue) {
+			dchar k = e.key.to!dchar;
+			double v = e.value.get!double;
+
+			total += v;
+
+			if (!(k in layout.keys)) {
+				continue;
+			}
+
+			raw[layout.keys[k].finger] += v;
+		}
+
+		writeln(layout.name);
+		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+		
+		"\n%-12s %-12s\n  ".writef("Index", "Ring");
+		"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
+		"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
+
+		writef("\n  ");
+
+		"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
+		"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
+		
+		"\n\n%-12s %-12s\n  ".writef("Middle", "Pinky");
+		"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
+		"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
+
+		writef("\n  ");
+
+		"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
+		"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
+
+		writeln();
 	}
 
 	if (cmds["sfb"].isTrue) {
