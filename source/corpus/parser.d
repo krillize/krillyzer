@@ -43,7 +43,7 @@ void setCorpus(string corpus, bool file = true) {
                 skipgrams[gram]++;
             }
 
-            speedgrams[gram] += 1.0 / 2.5.pow(j);
+            speedgrams[gram] += 1.0 / 3.5.pow(j);
         }
     }
 

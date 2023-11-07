@@ -26,4 +26,12 @@ struct Layout {
     string main;
     
     Position[dchar] keys;
+
+    void swap(dchar a, dchar b) {
+        auto temp = this.keys[a];
+        this.keys[a] = this.keys[b];
+        this.keys[b] = temp;
+
+        this.main = this.main.map!(x => [a: b, b: a].get(x, x)).to!string;
+    }
 }

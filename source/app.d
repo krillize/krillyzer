@@ -11,39 +11,13 @@ krillyzer
 Usage:
   krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
+  krillyzer gen
   krillyzer rank
   krillyzer sfb <layout> [--dist] [--pairs] [--ignoreCase] [--amount=<int>]
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer debug <layout> <bigram>
   krillyzer -h | --help
 ";
-
-double score(Layout layout, JSONValue json) {
-	double total = 0;
-	double count = 0;
-
-	foreach(e; json["speedgrams"].object.byKeyValue) {
-		string k = e.key;
-		double v = e.value.get!double;
-
-		total += v;
-
-		if (
-			!(k[0] in layout.keys) ||
-			!(k[1] in layout.keys)
-		) {
-			continue;
-		}
-
-		auto pos = k.map!(x => layout.keys[x]).array;
-
-		if (pos.isSFB) {
-			count += v * pos.distance;
-		}
-	}
-
-	return count / total * 100;
-}
 
 void main(string[] args) {
     auto cmds = doc.docopt(args[1..$]);
@@ -84,6 +58,10 @@ void main(string[] args) {
 			cmds["<bigram>"].toString,
 			cmds["--ignoreCase"].isTrue,
 		);
+	}
+
+	if (cmds["gen"].isTrue) {
+		generate();
 	}
 
 	if (cmds["sfb"].isTrue) {
@@ -168,7 +146,7 @@ void main(string[] args) {
 
 		foreach (e; layouts) {
 			auto layout = getLayout(e);
-			scores[layout.name] = score(layout, json);
+			scores[layout.name] = scoreLayout(layout, json);
 		}
 
 		foreach (k, v; scores.byPair.array.sort!"a[1] > b[1]") {
