@@ -203,9 +203,32 @@ void main(string[] args) {
 			}
 		}
 
+		foreach (e; data["skipgrams"].object.byKeyValue) {
+			string k = e.key;
+			double v = e.value.get!double;
+
+			if (
+				!(k[0] in layout.keys) ||
+				!(k[1] in layout.keys)
+			) {
+				continue;
+			}
+
+			auto pos = k.map!(x => layout.keys[x]).array;
+
+			if (pos.isSFB) {
+				raw["sfs"] += v;
+				raw["sfs-dist"] += v * pos.distance;
+			}
+		}
+
 		writeln("\nSFB");
 		"  Total  %.3f%%".writefln(raw["sfb"] / total * 100);
 		"  Dist   %.2f".writefln(raw["sfb-dist"] / raw["sfb"]);
+
+		writeln("\nSFS");
+		"  Total  %.3f%%".writefln(raw["sfs"] / total * 100);
+		"  Dist   %.2f".writefln(raw["sfs-dist"] / raw["sfs"]);
 
 		writeln("\nLSB");
 		"  Total  %.3f%%".writefln(raw["lsb"] / total * 100);
