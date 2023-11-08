@@ -226,15 +226,15 @@ void main(string[] args) {
 		// "L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
 
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
-		"Freq %-12s".writef("%.3f%%".format(raw["sfb"] / total * 100));
-		"Freq %-12s".writef("%.3f%%".format(raw["sfs"] / total * 100));
-		"Freq %-12s".writef("%.3f%%".format(raw["lsb"] / total * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / total * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"] / total * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["lsb"] / total * 100));
 
 		writef("\n  ");
 
-		"Dist %-12s".writef("%.2f".format(raw["sfb-dist"] / raw["sfb"]));
-		"Dist %-12s".writef("%.2f".format(raw["sfs-dist"] / raw["sfs"]));
-		"Dist %-12s".writef("%.2f".format(raw["lsb-dist"] / raw["lsb"]));
+		"Dist %-12s".writef("%6.3f".format(raw["sfb-dist"] / raw["sfb"]));
+		"Dist %-12s".writef("%6.3f".format(raw["sfs-dist"] / raw["sfs"]));
+		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
 
 		writeln("\n\nTrigrams");
 
