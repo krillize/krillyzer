@@ -11,14 +11,121 @@ krillyzer
 Usage:
   krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
-  krillyzer gen
-  krillyzer rank
+  krillyzer stats <layout>
+  krillyzer sfb <layout> [--dist] [--amount=<int>]
   krillyzer use <layout>
-  krillyzer sfb <layout> [--dist] [--pairs] [--ignoreCase] [--amount=<int>]
   krillyzer freq <bigram> [--ignoreCase]
+  krillyzer rank
+  krillyzer gen
   krillyzer debug <layout> <bigram>
   krillyzer -h | --help
 ";
+
+void showUse(Layout layout, JSONValue data) {
+	auto monograms = data["monograms"];
+
+	double total = 0;
+	double[int] raw;
+
+	foreach (e; monograms.object.byKeyValue) {
+		dchar k = e.key.to!dchar;
+		double v = e.value.get!double;
+
+		total += v;
+
+		if (!(k in layout.keys)) {
+			continue;
+		}
+
+		raw[layout.keys[k].finger] += v;
+	}
+	
+	"%-12s %-12s\n  ".writef("Index", "Ring");
+	"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
+
+	writef("\n  ");
+
+	"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
+	
+	"\n\n%-12s %-12s\n  ".writef("Middle", "Pinky");
+	"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
+
+	writef("\n  ");
+
+	"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
+
+	writeln();
+}
+
+void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false) {
+	auto bigrams = data["bigrams"];
+	
+	double total = 0;
+	double[int] raw;
+
+	string[] sfbs; 
+	foreach (e; bigrams.object.byKeyValue) {
+		string k = e.key;
+		double v = e.value.get!double;
+		
+		total += v;
+
+		if (
+			!(k[0] in layout.keys) ||
+			!(k[1] in layout.keys)
+		) {
+			continue;
+		}
+
+		auto pos = k.map!(x => layout.keys[x]).array;
+
+		if (!pos.isSFB) {
+			continue;
+		}
+
+		foreach (i; 0 .. 10) {
+			double count = v * (pos[0].finger == i);
+
+			if (dist) {
+				count *= pos.distance;
+			}
+
+			raw[i] += count;
+		}
+
+		sfbs ~= k;
+	}
+
+	sfbs.sort!((a, b) => bigrams[a].get!double > bigrams[b].get!double).take(3);
+
+	// writeln(layout.name);
+	// layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+	
+	"SFB %.3f%%".writefln(raw.values.sum / total * 100);
+	"  Pinky  %.3f%%".writefln((raw[0] + raw[6]) / total * 100);
+	"  Ring   %.3f%%".writefln((raw[1] + raw[7]) / total * 100);
+	"  Middle %.3f%%".writefln((raw[2] + raw[8]) / total * 100);
+	"  Index  %.3f%%".writefln((raw[3] + raw[9]) / total * 100);
+
+	writeln("\nWorst");
+	foreach (row; sfbs.take(amount).chunks(4)) {
+		foreach (gram; row) {
+			auto pos = gram.map!(x => layout.keys[x]).array;
+			double count = bigrams[gram].get!double / total * 100;
+
+			if (dist) {
+				count *= pos.distance;
+			}
+
+			"  %s %-7s".writef(gram, "%.3f%%".format(count));
+		}
+		writeln;
+	}
+}
 
 void main(string[] args) {
     auto cmds = doc.docopt(args[1..$]);
@@ -65,122 +172,45 @@ void main(string[] args) {
 		generate();
 	}
 
-	if (cmds["use"].isTrue) {
+	if (cmds["stats"].isTrue) {
 		auto layout = getLayout(cmds["<layout>"].toString);
-		auto monograms = "data.json".readText.parseJSON["monograms"];
-
-		double total = 0;
-		double[int] raw;
-
-		foreach (e; monograms.object.byKeyValue) {
-			dchar k = e.key.to!dchar;
-			double v = e.value.get!double;
-
-			total += v;
-
-			if (!(k in layout.keys)) {
-				continue;
-			}
-
-			raw[layout.keys[k].finger] += v;
-		}
+		auto data = "data.json".readText.parseJSON;
 
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
-		
-		"\n%-12s %-12s\n  ".writef("Index", "Ring");
-		"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
-		"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
-
-		writef("\n  ");
-
-		"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
-		"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
-		
-		"\n\n%-12s %-12s\n  ".writef("Middle", "Pinky");
-		"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
-		"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
-
-		writef("\n  ");
-
-		"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
-		"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
-
 		writeln();
+
+		showUse(layout, data);
+		writeln();
+		showSFB(layout, data, 8);
+	}
+
+	if (cmds["use"].isTrue) {
+		auto layout = getLayout(cmds["<layout>"].toString);
+		auto data = "data.json".readText.parseJSON;
+
+		writeln(layout.name);
+		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+		writeln();
+
+		showUse(layout, data);
 	}
 
 	if (cmds["sfb"].isTrue) {
 		auto layout = getLayout(cmds["<layout>"].toString);
-		auto bigrams = getBigrams(
-			cmds["--ignoreCase"].isTrue, 
-			cmds["--pairs"].isTrue
-		);
-
-		double total = 0;
-		double[int] raw;
-
-		string[] sfbs; 
-		foreach (k, v; bigrams) {
-			total += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (!pos.isSFB) {
-				continue;
-			}
-
-			foreach (i; 0 .. 10) {
-				double count = v * (pos[0].finger == i);
-
-				if (cmds["--dist"].isTrue) {
-					count *= pos.distance;
-				}
-
-				raw[i] += count;
-			}
-
-			sfbs ~= k;
-		}
-
-		sfbs.sort!((a, b) => bigrams[a] > bigrams[b]).take(3);
-
-		writeln(layout.name);
-		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
-		
-		"\nSFB %.3f%%".writefln(raw.values.sum / total * 100);
-		"  Pinky  %.3f%%".writefln((raw[0] + raw[6]) / total * 100);
-		"  Ring   %.3f%%".writefln((raw[1] + raw[7]) / total * 100);
-		"  Middle %.3f%%".writefln((raw[2] + raw[8]) / total * 100);
-		"  Index  %.3f%%".writefln((raw[3] + raw[9]) / total * 100);
+		auto data = "data.json".readText.parseJSON;
 
 		int amount = 16;
-		
 		if (cmds["--amount"].isString) {
 			string str = cmds["--amount"].toString;
 			amount = str.parse!int;
 		}
 
-		writeln("\nWorst");
-		foreach (row; sfbs.take(amount).chunks(4)) {
-			foreach (gram; row) {
-				auto pos = gram.map!(x => layout.keys[x]).array;
-				double count = bigrams[gram].to!float / total * 100;
+		writeln(layout.name);
+		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+		writeln();
 
-				if (cmds["--dist"].isTrue) {
-					count *= pos.distance;
-				}
-
-				"  %s %-7s".writef(gram, "%.3f%%".format(count));
-			}
-			writeln;
-		}
+		showSFB(layout, data, amount, cmds["--dist"].isTrue);
 	}
 
 	if (cmds["rank"].isTrue) {
