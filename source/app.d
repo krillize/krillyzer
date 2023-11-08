@@ -61,7 +61,7 @@ void showUse(Layout layout, JSONValue data) {
 	writeln();
 }
 
-void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false) {
+void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, bool worst = false) {
 	auto bigrams = data["bigrams"];
 	
 	double total = 0;
@@ -99,11 +99,6 @@ void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false) 
 
 		sfbs ~= k;
 	}
-
-	sfbs.sort!((a, b) => bigrams[a].get!double > bigrams[b].get!double).take(3);
-
-	// writeln(layout.name);
-	// layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 	
 	"SFB %.3f%%".writefln(raw.values.sum / total * 100);
 	"  Pinky  %.3f%%".writefln((raw[0] + raw[6]) / total * 100);
@@ -111,20 +106,25 @@ void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false) 
 	"  Middle %.3f%%".writefln((raw[2] + raw[8]) / total * 100);
 	"  Index  %.3f%%".writefln((raw[3] + raw[9]) / total * 100);
 
-	writeln("\nWorst");
-	foreach (row; sfbs.take(amount).chunks(4)) {
-		foreach (gram; row) {
-			auto pos = gram.map!(x => layout.keys[x]).array;
-			double count = bigrams[gram].get!double / total * 100;
+	if (worst) {
+		sfbs.sort!((a, b) => bigrams[a].get!double > bigrams[b].get!double).take(3);
 
-			if (dist) {
-				count *= pos.distance;
+		writeln("\nWorst");
+		foreach (row; sfbs.take(amount).chunks(4)) {
+			foreach (gram; row) {
+				auto pos = gram.map!(x => layout.keys[x]).array;
+				double count = bigrams[gram].get!double / total * 100;
+
+				if (dist) {
+					count *= pos.distance;
+				}
+
+				"  %s %-7s".writef(gram, "%.3f%%".format(count));
 			}
-
-			"  %s %-7s".writef(gram, "%.3f%%".format(count));
+			writeln;
 		}
-		writeln;
 	}
+
 }
 
 void main(string[] args) {
@@ -180,9 +180,9 @@ void main(string[] args) {
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 		writeln();
 
-		showUse(layout, data);
-		writeln();
 		showSFB(layout, data, 8);
+		writeln();
+		showUse(layout, data);
 	}
 
 	if (cmds["use"].isTrue) {
@@ -210,7 +210,7 @@ void main(string[] args) {
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 		writeln();
 
-		showSFB(layout, data, amount, cmds["--dist"].isTrue);
+		showSFB(layout, data, amount, cmds["--dist"].isTrue, true);
 	}
 
 	if (cmds["rank"].isTrue) {
