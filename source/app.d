@@ -40,21 +40,16 @@ void showUse(Layout layout, JSONValue data) {
 		raw[layout.keys[k].finger] += v;
 	}
 	
-	"%-12s %-12s\n  ".writef("Index", "Ring");
+	"%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
 	"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
 	"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
-
-	writef("\n  ");
-
-	"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
-	
-	"\n\n%-12s %-12s\n  ".writef("Middle", "Pinky");
 	"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
 	"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
 
 	writef("\n  ");
 
+	"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
 	"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
 	"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
 
@@ -178,9 +173,44 @@ void main(string[] args) {
 
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
-		writeln();
 
-		showSFB(layout, data, 8);
+		double total = 0;
+		double[string] raw;
+
+		foreach (e; data["bigrams"].object.byKeyValue) {
+			string k = e.key;
+			double v = e.value.get!double;
+
+			total += v;
+
+			if (
+				!(k[0] in layout.keys) ||
+				!(k[1] in layout.keys)
+			) {
+				continue;
+			}
+
+			auto pos = k.map!(x => layout.keys[x]).array;
+
+			if (pos.isSFB) {
+				raw["sfb"] += v;
+				raw["sfb-dist"] += v * pos.distance;
+			}
+
+			if (pos.isLSB) {
+				raw["lsb"] += v;
+				raw["lsb-dist"] += v * pos.distance;
+			}
+		}
+
+		writeln("\nSFB");
+		"  Total  %.3f%%".writefln(raw["sfb"] / total * 100);
+		"  Dist   %.2f".writefln(raw["sfb-dist"] / raw["sfb"]);
+
+		writeln("\nLSB");
+		"  Total  %.3f%%".writefln(raw["lsb"] / total * 100);
+		"  Dist   %.2f".writefln(raw["lsb-dist"] / raw["lsb"]);
+		
 		writeln();
 		showUse(layout, data);
 	}
