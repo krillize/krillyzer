@@ -222,18 +222,22 @@ void main(string[] args) {
 			}
 		}
 
-		writeln("\nSFB");
-		"  Total  %.3f%%".writefln(raw["sfb"] / total * 100);
-		"  Dist   %.2f".writefln(raw["sfb-dist"] / raw["sfb"]);
+		// "%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
+		// "L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
 
-		writeln("\nSFS");
-		"  Total  %.3f%%".writefln(raw["sfs"] / total * 100);
-		"  Dist   %.2f".writefln(raw["sfs-dist"] / raw["sfs"]);
+		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
+		"Freq %-12s".writef("%.3f%%".format(raw["sfb"] / total * 100));
+		"Freq %-12s".writef("%.3f%%".format(raw["sfs"] / total * 100));
+		"Freq %-12s".writef("%.3f%%".format(raw["lsb"] / total * 100));
 
-		writeln("\nLSB");
-		"  Total  %.3f%%".writefln(raw["lsb"] / total * 100);
-		"  Dist   %.2f".writefln(raw["lsb-dist"] / raw["lsb"]);
-		
+		writef("\n  ");
+
+		"Dist %-12s".writef("%.2f".format(raw["sfb-dist"] / raw["sfb"]));
+		"Dist %-12s".writef("%.2f".format(raw["sfs-dist"] / raw["sfs"]));
+		"Dist %-12s".writef("%.2f".format(raw["lsb-dist"] / raw["lsb"]));
+
+		writeln("\n\nTrigrams");
+
 		writeln();
 		showUse(layout, data);
 	}
