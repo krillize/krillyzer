@@ -21,6 +21,7 @@ void setCorpus(string corpus, bool file = true) {
 
     double[string] monograms;
     double[string] bigrams;
+    double[string] trigrams;
     double[string] skipgrams;
     double[string] speedgrams;
 
@@ -46,6 +47,10 @@ void setCorpus(string corpus, bool file = true) {
                 skipgrams[gram]++;
             }
 
+            if (j == 1 && text[i + j] != ' ') {
+                trigrams[text[i .. i + 3].to!string]++;
+            }
+
             speedgrams[gram] += 1.0 / 3.5.pow(j);
         }
     }
@@ -53,6 +58,7 @@ void setCorpus(string corpus, bool file = true) {
     [
         "monograms":  monograms,
         "bigrams":    bigrams,
+        "trigrams":   trigrams,
         "skipgrams":  skipgrams,
         "speedgrams": speedgrams,
     ].JSONValue.toPrettyString.toFile("data.json");

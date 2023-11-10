@@ -26,3 +26,52 @@ double distSFB(Position[] pos) {
 double distLSB(Position[] pos) {
     return pos.isLSB * pos.distance;
 }
+
+bool isAlternate(Position[] pos) {
+    return (
+        (!pos[0 .. 2].sameHand) &&
+        (!pos[1 .. 3].sameHand)
+    );
+}
+
+bool isRoll(Position[] pos) {
+    return !(
+        ([pos[0], pos[2]].sameHand) ||
+        (pos[0 .. 2].sameFinger) ||
+        (pos[1 .. 3].sameFinger)
+    );
+}
+
+bool isInroll(Position[] pos) {
+    return (
+        pos.isRoll &&
+        max(pos[0 .. 2].direction, pos[1 .. 3].direction) == 1
+    );
+}
+
+bool isOutroll(Position[] pos) {
+    return (
+        pos.isRoll &&
+        min(pos[0 .. 2].direction, pos[1 .. 3].direction) == -1
+    );
+}
+
+bool isRedirect(Position[] pos) {
+    return (
+        (pos[0 .. 2].sameHand) &&
+        (pos[1 .. 3].sameHand) &&
+        (!pos[0 .. 2].sameFinger) &&
+        (!pos[1 .. 3].sameFinger) &&
+        (pos[0 .. 2].direction != pos[1 .. 3].direction)
+    );
+}
+
+bool isOnehand(Position[] pos) {
+    return (
+        (pos[0 .. 2].sameHand) &&
+        (pos[1 .. 3].sameHand) &&
+        (!pos[0 .. 2].sameFinger) &&
+        (!pos[1 .. 3].sameFinger) &&
+        (pos[0 .. 2].direction == pos[1 .. 3].direction)
+    );
+}

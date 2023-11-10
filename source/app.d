@@ -122,6 +122,88 @@ void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, 
 
 }
 
+void debugBigram(Layout layout, string gram) {
+	auto json = "data.json".readText.parseJSON;
+	auto pos = gram.map!(x => layout.keys[x]).array;
+
+	double bigram = (
+		(
+			json["bigrams"][gram].get!double +
+			json["bigrams"][gram.dup.reverse].get!double
+		)/ 
+		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+		100
+	);
+
+	double skipgram = (
+		(
+			json["skipgrams"][gram].get!double +
+			json["skipgrams"][gram.dup.reverse].get!double
+		)/ 
+		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+		100
+	);
+
+	double speedgram = (
+		(
+			json["speedgrams"][gram].get!double +
+			json["speedgrams"][gram.dup.reverse].get!double
+		)/ 
+		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+		100
+	);
+
+	"%s (%s)".writefln(layout.name, layout.format);
+	layout.main.map!(
+		x => ['\n', ' ', gram[0], gram[1]].canFind(x) ? x : ' '
+	).to!string.splitter("\n").each!(x => "  %s".writefln(x));
+
+	writeln();
+
+	"%s %s".writefln(gram[0], pos[0]);
+	"%s %s".writefln(gram[1], pos[1]);
+
+	writeln("\ncorpus");
+	"  bigram     %.3f%%".writefln(bigram);
+	"  skipgram   %.3f%%".writefln(skipgram);
+	"  speedgram  %.3f%%".writefln(speedgram);
+
+	writeln("\nflags");
+	"  repeat      %2d".writefln(pos.isRepeat);
+	"  sameFinger  %2d".writefln(pos.sameFinger);
+	"  sameHand    %2d".writefln(pos.sameHand);
+	"  isAdjacent  %2d".writefln(pos.isAdjacent);
+
+	writeln("\nvalues");
+	"  direction   %2d".writefln(pos.direction);
+	"  horizontal  %2d".writefln(pos.distHorizontal);
+	"  vertical    %2d".writefln(pos.distVertical);
+	"  distance  %2.2f".writefln(pos.distance);
+}
+
+void debugTrigram(Layout layout, string gram) {
+	auto json = "data.json".readText.parseJSON;
+	auto pos = gram.map!(x => layout.keys[x]).array;
+
+	"%s (%s)".writefln(layout.name, layout.format);
+	layout.main.map!(
+		x => ['\n', ' ', gram[0], gram[1], gram[2]].canFind(x) ? x : ' '
+	).to!string.splitter("\n").each!(x => "  %s".writefln(x));
+
+	writeln();
+
+	"%s %s".writefln(gram[0], pos[0]);
+	"%s %s".writefln(gram[1], pos[1]);
+	"%s %s".writefln(gram[2], pos[2]);
+
+	writeln("\nflags");
+	"  alternate %2d".writefln(pos.isAlternate);
+	"  inroll    %2d".writefln(pos.isInroll);
+	"  outroll   %2d".writefln(pos.isOutroll);
+	"  redirect  %2d".writefln(pos.isRedirect);	
+	"  onehand   %2d".writefln(pos.isOnehand);
+}
+
 void main(string[] args) {
     auto cmds = doc.docopt(args[1..$]);
 
@@ -168,7 +250,15 @@ void main(string[] args) {
 	}
 
 	if (cmds["stats"].isTrue) {
-		auto layout = getLayout(cmds["<layout>"].toString);
+		Layout layout;
+		
+		try {
+			layout = getLayout(cmds["<layout>"].toString);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+
 		auto data = "data.json".readText.parseJSON;
 
 		writeln(layout.name);
@@ -222,8 +312,40 @@ void main(string[] args) {
 			}
 		}
 
-		// "%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
-		// "L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
+		foreach (e; data["trigrams"].object.byKeyValue) {
+			string k = e.key;
+			double v = e.value.get!double;
+
+			if (
+				!(k[0] in layout.keys) ||
+				!(k[1] in layout.keys) ||
+				!(k[2] in layout.keys)
+			) {
+				continue;
+			}
+
+			auto pos = k.map!(x => layout.keys[x]).array;
+
+			if (pos.isAlternate) {
+				raw["alt"] += v;
+			}
+
+			if (pos.isInroll) {
+				raw["inroll"] += v;
+			}
+
+			if (pos.isOutroll) {
+				raw["outroll"] += v;
+			}
+
+			if (pos.isRedirect) {
+				raw["red"] += v;
+			}
+
+			if (pos.isOnehand) {
+				raw["one"] += v;
+			}
+		}
 
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
 		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / total * 100));
@@ -236,14 +358,30 @@ void main(string[] args) {
 		"Dist %-12s".writef("%6.3f".format(raw["sfs-dist"] / raw["sfs"]));
 		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
 
-		writeln("\n\nTrigrams");
+		writeln("\n\nRolls");
+		"  Total   %.3f%%".writefln((raw["inroll"] + raw["outroll"]) / total * 100);
+		"  Inroll  %.3f%%".writefln(raw["inroll"] / total * 100);
+		"  Outroll %.3f%%".writefln(raw["outroll"] / total * 100);
+
+		writeln("\nTrigrams");
+		"  Alternates %.3f%%".writefln(raw["alt"] / total * 100);
+		"  Redirects  %.3f%%".writefln(raw["red"] / total * 100);
+		"  Onehands   %.3f%%".writefln(raw["one"] / total * 100);
 
 		writeln();
 		showUse(layout, data);
 	}
 
 	if (cmds["use"].isTrue) {
-		auto layout = getLayout(cmds["<layout>"].toString);
+		Layout layout;
+		
+		try {
+			layout = getLayout(cmds["<layout>"].toString);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+
 		auto data = "data.json".readText.parseJSON;
 
 		writeln(layout.name);
@@ -254,7 +392,15 @@ void main(string[] args) {
 	}
 
 	if (cmds["sfb"].isTrue) {
-		auto layout = getLayout(cmds["<layout>"].toString);
+		Layout layout;
+		
+		try {
+			layout = getLayout(cmds["<layout>"].toString);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+
 		auto data = "data.json".readText.parseJSON;
 
 		int amount = 16;
@@ -287,71 +433,23 @@ void main(string[] args) {
 	}
 
 	if (cmds["debug"].isTrue) {
+		Layout layout;
+		
 		try {
-			auto layout = getLayout(cmds["<layout>"].toString);
-			auto json = "data.json".readText.parseJSON;
-
-			string gram = cmds["<bigram>"].toString;
-			auto pos = gram.map!(x => layout.keys[x]).array;
-
-			double bigram = (
-				(
-					json["bigrams"][gram].get!double +
-					json["bigrams"][gram.dup.reverse].get!double
-				)/ 
-				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-				100
-			);
-
-			double skipgram = (
-				(
-					json["skipgrams"][gram].get!double +
-					json["skipgrams"][gram.dup.reverse].get!double
-				)/ 
-				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-				100
-			);
-
-			double speedgram = (
-				(
-					json["speedgrams"][gram].get!double +
-					json["speedgrams"][gram.dup.reverse].get!double
-				)/ 
-				json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-				100
-			);
-
-			"%s (%s)".writefln(layout.name, layout.format);
-			layout.main.map!(
-				x => ['\n', ' ', gram[0], gram[1]].canFind(x) ? x : ' '
-			).to!string.splitter("\n").each!(x => "  %s".writefln(x));
-
-			writeln();
-
-			"%s %s".writefln(gram[0], pos[0]);
-			"%s %s".writefln(gram[1], pos[1]);
-
-			writeln("\ncorpus");
-			"  bigram     %.3f%%".writefln(bigram);
-			"  skipgram   %.3f%%".writefln(skipgram);
-			"  speedgram  %.3f%%".writefln(speedgram);
-
-			writeln("\nflags");
-			"  repeat      %2d".writefln(pos.isRepeat);
-			"  sameFinger  %2d".writefln(pos.sameFinger);
-			"  sameHand    %2d".writefln(pos.sameHand);
-			"  isAdjacent  %2d".writefln(pos.isAdjacent);
-
-			writeln("\nvalues");
-			"  direction   %2d".writefln(pos.direction);
-			"  horizontal  %2d".writefln(pos.distHorizontal);
-			"  vertical    %2d".writefln(pos.distVertical);
-			"  distance  %2.2f".writefln(pos.distance);
-
+			layout = getLayout(cmds["<layout>"].toString);
 		} catch (ParserException e) {
 			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+
+		string gram = cmds["<bigram>"].toString;
+
+		if (gram.length == 2) {
+			debugBigram(layout, gram);
+		}
+
+		if (gram.length == 3) {
+			debugTrigram(layout, gram);
 		}
 	}
-	
-    // writeln(cmds);
 }
