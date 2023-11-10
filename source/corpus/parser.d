@@ -51,7 +51,7 @@ void setCorpus(string corpus, bool file = true) {
                 trigrams[text[i .. i + 3].to!string]++;
             }
 
-            speedgrams[gram] += 1.0 / 3.5.pow(j);
+            speedgrams[gram] += 1.0 / (j + 1).pow(2);
         }
     }
 

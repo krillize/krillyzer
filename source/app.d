@@ -267,6 +267,7 @@ void main(string[] args) {
 		double btotal = 0;
 		double stotal = 0;
 		double ttotal = 0;
+		double ptotal = 0;
 
 		double[string] raw;
 
@@ -354,6 +355,31 @@ void main(string[] args) {
 			}
 		}
 
+		foreach (e; data["speedgrams"].object.byKeyValue) {
+			string k = e.key;
+			double v = e.value.get!double;
+
+			ptotal += v;
+
+			if (
+				!(k[0] in layout.keys) ||
+				!(k[1] in layout.keys)
+			) {
+				continue;
+			}
+
+			auto pos = k.map!(x => layout.keys[x]).array;
+
+			if (pos.isSFB) {
+				auto finger = pos[0].finger;
+				
+				raw[finger.to!string] += (
+					v * pos.distance.pow(0.65) * 
+					(1 / [1.5, 3.6, 4.8, 5.5, 0, 0, 5.5, 4.8, 3.6, 1.5][finger])
+				);
+			}
+		}
+
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
 		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / btotal * 100));
 		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"] / stotal * 100));
@@ -365,7 +391,13 @@ void main(string[] args) {
 		"Dist %-12s".writef("%6.3f".format(raw["sfs-dist"] / raw["sfs"]));
 		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
 
-		writeln("\n\nRolls");
+		writeln("\n\nFspeed");
+		"  Pinky  %.3f".writefln((raw["LP"] + raw["RP"]) / ptotal * 100);
+		"  Ring   %.3f".writefln((raw["LR"] + raw["RR"]) / ptotal * 100);
+		"  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
+		"  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
+
+		writeln("\nRolls");
 		"  Total   %.3f%%".writefln((raw["inroll"] + raw["outroll"]) / ttotal * 100);
 		"  Inroll  %.3f%%".writefln(raw["inroll"] / ttotal * 100);
 		"  Outroll %.3f%%".writefln(raw["outroll"] / ttotal * 100);
