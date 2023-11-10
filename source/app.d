@@ -264,14 +264,17 @@ void main(string[] args) {
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
-		double total = 0;
+		double btotal = 0;
+		double stotal = 0;
+		double ttotal = 0;
+
 		double[string] raw;
 
 		foreach (e; data["bigrams"].object.byKeyValue) {
 			string k = e.key;
 			double v = e.value.get!double;
 
-			total += v;
+			btotal += v;
 
 			if (
 				!(k[0] in layout.keys) ||
@@ -297,6 +300,8 @@ void main(string[] args) {
 			string k = e.key;
 			double v = e.value.get!double;
 
+			stotal += v;
+
 			if (
 				!(k[0] in layout.keys) ||
 				!(k[1] in layout.keys)
@@ -315,6 +320,8 @@ void main(string[] args) {
 		foreach (e; data["trigrams"].object.byKeyValue) {
 			string k = e.key;
 			double v = e.value.get!double;
+
+			ttotal += v;
 
 			if (
 				!(k[0] in layout.keys) ||
@@ -348,9 +355,9 @@ void main(string[] args) {
 		}
 
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
-		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / total * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"] / total * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw["lsb"] / total * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / btotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"] / stotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["lsb"] / btotal * 100));
 
 		writef("\n  ");
 
@@ -359,14 +366,14 @@ void main(string[] args) {
 		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
 
 		writeln("\n\nRolls");
-		"  Total   %.3f%%".writefln((raw["inroll"] + raw["outroll"]) / total * 100);
-		"  Inroll  %.3f%%".writefln(raw["inroll"] / total * 100);
-		"  Outroll %.3f%%".writefln(raw["outroll"] / total * 100);
+		"  Total   %.3f%%".writefln((raw["inroll"] + raw["outroll"]) / ttotal * 100);
+		"  Inroll  %.3f%%".writefln(raw["inroll"] / ttotal * 100);
+		"  Outroll %.3f%%".writefln(raw["outroll"] / ttotal * 100);
 
 		writeln("\nTrigrams");
-		"  Alternates %.3f%%".writefln(raw["alt"] / total * 100);
-		"  Redirects  %.3f%%".writefln(raw["red"] / total * 100);
-		"  Onehands   %.3f%%".writefln(raw["one"] / total * 100);
+		"  Alternates %.3f%%".writefln(raw["alt"] / ttotal * 100);
+		"  Redirects  %.3f%%".writefln(raw["red"] / ttotal * 100);
+		"  Onehands   %.3f%%".writefln(raw["one"] / ttotal * 100);
 
 		writeln();
 		showUse(layout, data);
