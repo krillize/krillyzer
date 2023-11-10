@@ -42,6 +42,24 @@ bool isRoll(Position[] pos) {
     );
 }
 
+bool isAdjacentRoll(Position[] pos) {
+    return (
+        pos.isRoll && (
+            pos[0 .. 2].isAdjacent ||
+            pos[1 .. 3].isAdjacent
+        )
+    );
+}
+
+bool isRowRoll(Position[] pos) {
+    return (
+        pos.isRoll && (
+            pos[0 .. 2].sameRow ||
+            pos[1 .. 3].sameRow
+        )
+    );
+}
+
 bool isInroll(Position[] pos) {
     return (
         pos.isRoll &&

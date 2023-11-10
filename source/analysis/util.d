@@ -47,6 +47,10 @@ bool sameFinger(Position[] pos) {
     return pos[0].finger == pos[1].finger;
 }
 
+bool sameRow(Position[] pos) {
+    return pos[0].row == pos[1].row;
+}
+
 bool sameHand(Position[] pos) {
     return pos[0].hand == pos[1].hand;
 }

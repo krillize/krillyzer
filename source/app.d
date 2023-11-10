@@ -13,6 +13,7 @@ Usage:
   krillyzer load <corpus> [--file]
   krillyzer stats <layout>
   krillyzer sfb <layout> [--dist] [--amount=<int>]
+  krillyzer roll <layout> [--relative]
   krillyzer use <layout>
   krillyzer freq <bigram> [--ignoreCase]
   krillyzer rank
@@ -198,6 +199,7 @@ void debugTrigram(Layout layout, string gram) {
 
 	writeln("\nflags");
 	"  alternate %2d".writefln(pos.isAlternate);
+	"  adjacent  %2d".writefln(pos.isAdjacentRoll);
 	"  inroll    %2d".writefln(pos.isInroll);
 	"  outroll   %2d".writefln(pos.isOutroll);
 	"  redirect  %2d".writefln(pos.isRedirect);	
@@ -338,6 +340,10 @@ void main(string[] args) {
 				raw["alt"] += v;
 			}
 
+			if (pos.isRoll) {
+				raw["rolls"] += v; 
+			}
+
 			if (pos.isInroll) {
 				raw["inroll"] += v;
 			}
@@ -397,18 +403,96 @@ void main(string[] args) {
 		"  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
 		"  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
 
-		writeln("\nRolls");
-		"  Total   %.3f%%".writefln((raw["inroll"] + raw["outroll"]) / ttotal * 100);
-		"  Inroll  %.3f%%".writefln(raw["inroll"] / ttotal * 100);
-		"  Outroll %.3f%%".writefln(raw["outroll"] / ttotal * 100);
+		"\nRolls %.3f%%".writefln(raw["rolls"] / ttotal * 100);
+		"  Inroll   %.3f%%".writefln(raw["inroll"] /  ttotal * 100);
+		"  Outroll  %.3f%%".writefln(raw["outroll"] / ttotal * 100);
 
 		writeln("\nTrigrams");
-		"  Alternates %.3f%%".writefln(raw["alt"] / ttotal * 100);
-		"  Redirects  %.3f%%".writefln(raw["red"] / ttotal * 100);
+		"  Alternates %6.3f%%".writefln(raw["alt"] / ttotal * 100);
+		"  Redirects  %6.3f%%".writefln(raw["red"] / ttotal * 100);
 		"  Onehands   %.3f%%".writefln(raw["one"] / ttotal * 100);
 
 		writeln();
 		showUse(layout, data);
+	}
+
+	if (cmds["roll"].isTrue) {
+		Layout layout;
+		
+		try {
+			layout = getLayout(cmds["<layout>"].toString);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+
+		auto data = "data.json".readText.parseJSON;
+
+		double total = 0;
+		double[string] raw;
+
+		foreach (e; data["trigrams"].object.byKeyValue) {
+			string k = e.key;
+			double v = e.value.get!double;
+
+			total += v;
+
+			if (
+				!(k[0] in layout.keys) ||
+				!(k[1] in layout.keys) ||
+				!(k[2] in layout.keys)
+			) {
+				continue;
+			}
+
+			auto pos = k.map!(x => layout.keys[x]).array;
+
+			if (pos.isAlternate) {
+				raw["alt"] += v;
+			}
+
+			if (pos.isAdjacentRoll) {
+				raw["adroll"] += v;
+			}
+
+			if (pos.isRoll) {
+				raw["rolls"] += v; 
+			}
+
+			if (pos.isRowRoll) {
+				raw["rowroll"] += v;
+			}
+
+			if (pos.isInroll) {
+				raw["inroll"] += v;
+			}
+
+			if (pos.isOutroll) {
+				raw["outroll"] += v;
+			}
+
+			if (pos.isRedirect) {
+				raw["red"] += v;
+			}
+
+			if (pos.isOnehand) {
+				raw["one"] += v;
+			}
+		}
+
+		double rtotal = total;
+		if (cmds["--relative"].isTrue) {
+			rtotal = raw["rolls"];
+		}
+
+		writeln(layout.name);
+		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+
+		"\nRolls %.3f%%".writefln(raw["rolls"] / total * 100);
+		"  Inroll   %.3f%%".writefln(raw["inroll"] /  rtotal * 100);
+		"  Outroll  %.3f%%".writefln(raw["outroll"] / rtotal * 100);
+		"  Adjacent %.3f%%".writefln(raw["adroll"] /  rtotal * 100);
+		"  Same Row %.3f%%".writefln(raw["rowroll"] / rtotal * 100);
 	}
 
 	if (cmds["use"].isTrue) {
