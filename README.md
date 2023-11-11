@@ -6,10 +6,7 @@
 ### potential stats
 
 #### Trigram
-- inroll %
-- outroll %
 - roll ratio
-- redirect %
 
 #### Misc
 - finger speed
