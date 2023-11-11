@@ -397,13 +397,13 @@ void main(string[] args) {
 		"Dist %-12s".writef("%6.3f".format(raw["sfs-dist"] / raw["sfs"]));
 		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
 
-		writeln("\n\nFspeed");
-		"  Pinky  %.3f".writefln((raw["LP"] + raw["RP"]) / ptotal * 100);
-		"  Ring   %.3f".writefln((raw["LR"] + raw["RR"]) / ptotal * 100);
-		"  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
-		"  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
+		// writeln("\n\nFspeed");
+		// "  Pinky  %.3f".writefln((raw["LP"] + raw["RP"]) / ptotal * 100);
+		// "  Ring   %.3f".writefln((raw["LR"] + raw["RR"]) / ptotal * 100);
+		// "  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
+		// "  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
 
-		"\nRolls %.3f%%".writefln(raw["rolls"] / ttotal * 100);
+		"\n\nRolls %.3f%%".writefln(raw["rolls"] / ttotal * 100);
 		"  Inroll   %.3f%%".writefln(raw["inroll"] /  ttotal * 100);
 		"  Outroll  %.3f%%".writefln(raw["outroll"] / ttotal * 100);
 
