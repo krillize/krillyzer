@@ -436,7 +436,7 @@ void main(string[] args) {
 		writeln("\nTrigrams");
 		"  Alternates %6.3f%%".writefln(raw["alt"] / ttotal * 100);
 		"  Redirects  %6.3f%%".writefln(raw["red"] / ttotal * 100);
-		"  Onehands   %.3f%%".writefln(raw["one"] / ttotal * 100);
+		"  Onehands   %6.3f%%".writefln(raw["one"] / ttotal * 100);
 
 		writeln("\nRows");
 		"  Top    %6.3f%%".writefln(raw["top"] / mtotal * 100);
