@@ -266,12 +266,38 @@ void main(string[] args) {
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
+		double mtotal = 0;
 		double btotal = 0;
 		double stotal = 0;
 		double ttotal = 0;
 		double ptotal = 0;
 
 		double[string] raw;
+
+		foreach (e; data["monograms"].object.byKeyValue) {
+			dchar k = e.key.to!dchar;
+			double v = e.value.get!double;
+
+			mtotal += v;
+
+			if (!(k in layout.keys)) {
+				continue;
+			}
+
+			auto pos = layout.keys[k];
+
+			if (pos.row == 0) {
+				raw["top"] += v;
+			}
+
+			if (pos.row == 1 && ![4, 5].canFind(pos.col)) {
+				raw["home"] += v;
+			}
+
+			if (pos.row == 2) {
+				raw["bottom"] += v;
+			}
+		}
 
 		foreach (e; data["bigrams"].object.byKeyValue) {
 			string k = e.key;
@@ -411,6 +437,11 @@ void main(string[] args) {
 		"  Alternates %6.3f%%".writefln(raw["alt"] / ttotal * 100);
 		"  Redirects  %6.3f%%".writefln(raw["red"] / ttotal * 100);
 		"  Onehands   %.3f%%".writefln(raw["one"] / ttotal * 100);
+
+		writeln("\nRows");
+		"  Top    %6.3f%%".writefln(raw["top"] / mtotal * 100);
+		"  Home   %6.3f%%".writefln(raw["home"] / mtotal * 100);
+		"  Bottom %6.3f%%".writefln(raw["bottom"] / mtotal * 100);
 
 		writeln();
 		showUse(layout, data);
