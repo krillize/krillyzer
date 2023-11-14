@@ -126,33 +126,32 @@ void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, 
 void debugBigram(Layout layout, string gram) {
 	auto json = "data.json".readText.parseJSON;
 	auto pos = gram.map!(x => layout.keys[x]).array;
+		
 
-	double bigram = (
-		(
-			json["bigrams"][gram].get!double +
-			json["bigrams"][gram.dup.reverse].get!double
-		)/ 
-		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-		100
-	);
+	double bigram = 0;
+	double skipgram = 0;
 
-	double skipgram = (
-		(
-			json["skipgrams"][gram].get!double +
-			json["skipgrams"][gram.dup.reverse].get!double
-		)/ 
-		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-		100
-	);
+	if (gram in json["bigrams"]) {
+		bigram = (
+			(
+				json["bigrams"][gram].get!double +
+				json["bigrams"][gram.dup.reverse].get!double
+			)/ 
+			json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+			100
+		);
+	}
 
-	double speedgram = (
-		(
-			json["speedgrams"][gram].get!double +
-			json["speedgrams"][gram.dup.reverse].get!double
-		)/ 
-		json["bigrams"].object.byValue.map!(x => x.get!double).sum *
-		100
-	);
+	if (gram in json["skipgrams"]) {
+		skipgram = (
+			(
+				json["skipgrams"][gram].get!double +
+				json["skipgrams"][gram.dup.reverse].get!double
+			)/ 
+			json["bigrams"].object.byValue.map!(x => x.get!double).sum *
+			100
+		);
+	}
 
 	"%s (%s)".writefln(layout.name, layout.format);
 	layout.main.map!(
@@ -167,7 +166,6 @@ void debugBigram(Layout layout, string gram) {
 	writeln("\ncorpus");
 	"  bigram     %.3f%%".writefln(bigram);
 	"  skipgram   %.3f%%".writefln(skipgram);
-	"  speedgram  %.3f%%".writefln(speedgram);
 
 	writeln("\nflags");
 	"  repeat      %2d".writefln(pos.isRepeat);
