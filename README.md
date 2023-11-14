@@ -1,13 +1,10 @@
 ### todo
 - add more stats
+- add rowstag and colstag support
 - add generator features like config and trigram stats
 - fix implementation of ngram parsing (currently converts the string to an array to fix utf-8 bug, very slow)
 
 ### potential stats
-
-#### Trigram
 - roll ratio
-
-#### Misc
+- center column use
 - finger speed
-- home %
