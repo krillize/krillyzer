@@ -79,11 +79,11 @@ int direction(Position[] pos) {
     return diff / abs(pos[0].finger - pos[1].finger);
 }
 
-int distHorizontal(Position[] pos) {
+double distHorizontal(Position[] pos) {
     return abs(pos[0].col - pos[1].col);
 }
 
-int distVertical(Position[] pos) {
+double distVertical(Position[] pos) {
     return abs(pos[0].row - pos[1].row);
 }
 

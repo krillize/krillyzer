@@ -3,74 +3,22 @@ module layout.parser;
 import std;
 
 import layout.keyboard;
-
-immutable defs = [
-    "name", "date", "format", "author", "fingers", 
-    "source", "desc", "main", "shift"
-];
-
-class ParserException : Exception {
-    this(string msg, string file = __FILE__, size_t line = __LINE__) {
-        super(msg, file, line);
-    }
-}
+import parsing;
 
 string[] getLayouts() {
     return "layouts".dirEntries("*.txt", SpanMode.depth)
         .map!(x => x.to!string.splitter("/").array[$ - 1][0 .. $ - 4]).array;
 }
 
-Layout getLayout(string name) {
+Layout getLayout(string name, string boardname) {
     auto layouts = "layouts".dirEntries("*%s.txt".format(name), SpanMode.depth).array;
+    auto boards = "boards".dirEntries("*%s.txt".format(boardname), SpanMode.depth).array;
 
     enforce!ParserException(!layouts.empty, 
         "layout \"%s\" not found...".format(name)
     );
-
-    auto file = layouts[0].File;
-
-    string[string] data;
-
-    bool inList = false;
-    string curr = "";
-
-    foreach (string line; file.lines) {
-        if (line.strip.length == 0) {
-            continue;
-        }
-
-        auto tokens = line.strip.splitter.array;
-
-        if (tokens[0] == "#") {
-            continue;
-        }
-
-        if (inList) {
-            if (tokens[0] == ")" && tokens.length == 1) {
-                inList = false;
-                data[curr] = data[curr].strip;
-            } else {
-                data[curr] ~= tokens.join(" ") ~ "\n";
-            }
-        } else { 
-            enforce!ParserException(defs.canFind(tokens[0]),
-                "unexpected key \"%s\"".format(tokens[0]) 
-            );
-
-            enforce!ParserException(tokens.length > 1,
-                "missing value for key \"%s\"".format(tokens[0])
-            );
-
-            if (tokens[1] == "(") {
-                inList = true;
-                curr = tokens[0];
-            } else {
-                data[tokens[0]] = tokens[1 .. $].join(" ");
-            }
-        }
-    }
-
-    enforce!ParserException(!inList, "list was never closed");
+    string[string] data = parseFile(layouts[0].File);
+    string[string] board = parseFile(boards[0].File);
 
     auto missing = ["main", "format", "name"].filter!(x => !(x in data));
     enforce!ParserException(missing.empty, 
@@ -139,6 +87,17 @@ Layout getLayout(string name) {
     int row;
     int col;
 
+    double[] roff = [0];
+    double[] coff = [0];
+
+    if (board["offset"] == "row") {
+        roff = board["stagger"].splitter("\n").map!(x => x.parse!double).array;
+    }
+    
+    if (board["offset"] == "col") {
+        coff = board["stagger"].splitter("\n").map!(x => x.parse!double).array;
+    }
+
     Position[dchar] keys;
     foreach (ch, sh, finger; zip(data["main"], data["shift"], data["fingers"])) {
         if (ch == '\n') {
@@ -158,7 +117,7 @@ Layout getLayout(string name) {
 
         Position pos = Position(
             row,
-            col,
+            col + roff[min(row, roff.length.to!int - 1)],
             (finger - '0').to!Finger,
             ((finger - '0') > 4).to!Hand
         );

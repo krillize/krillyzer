@@ -4,6 +4,7 @@ import docopt : docopt;
 import corpus;
 import layout;
 import analysis;
+import parsing;
 
 immutable string doc = "
 krillyzer
@@ -11,7 +12,7 @@ krillyzer
 Usage:
   krillyzer list (layouts | corpora) [--contains=<string>]
   krillyzer load <corpus> [--file]
-  krillyzer stats <layout>
+  krillyzer stats <layout> [--board=<board>]
   krillyzer sfb <layout> [--dist] [--amount=<int>]
   krillyzer roll <layout> [--relative]
   krillyzer use <layout>
@@ -174,14 +175,13 @@ void debugBigram(Layout layout, string gram) {
 	"  isAdjacent  %2d".writefln(pos.isAdjacent);
 
 	writeln("\nvalues");
-	"  direction   %2d".writefln(pos.direction);
-	"  horizontal  %2d".writefln(pos.distHorizontal);
-	"  vertical    %2d".writefln(pos.distVertical);
-	"  distance  %2.2f".writefln(pos.distance);
+	"  direction     %2d".writefln(pos.direction);
+	"  horizontal  %2.2f".writefln(pos.distHorizontal);
+	"  vertical    %2.2f".writefln(pos.distVertical);
+	"  distance    %2.2f".writefln(pos.distance);
 }
 
 void debugTrigram(Layout layout, string gram) {
-	auto json = "data.json".readText.parseJSON;
 	auto pos = gram.map!(x => layout.keys[x]).array;
 
 	"%s (%s)".writefln(layout.name, layout.format);
@@ -206,6 +206,23 @@ void debugTrigram(Layout layout, string gram) {
 
 void main(string[] args) {
     auto cmds = doc.docopt(args[1..$]);
+
+	auto config = parseFile("config.txt".File);
+	
+	string board = config["board"];
+	if (cmds["--board"].isString) {
+		board = cmds["--board"].toString;
+	}
+
+	Layout layout;
+	if (cmds["<layout>"].isString) {
+		try {
+			layout = getLayout(cmds["<layout>"].toString, board);
+		} catch (ParserException e) {
+			"Error in layout file: %s".writefln(e.msg);
+			return;
+		}
+	}
 
 	if (cmds["load"].isTrue) {
 		setCorpus(
@@ -250,15 +267,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["stats"].isTrue) {
-		Layout layout;
-		
-		try {
-			layout = getLayout(cmds["<layout>"].toString);
-		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
-			return;
-		}
-
 		auto data = "data.json".readText.parseJSON;
 
 		writeln(layout.name);
@@ -446,15 +454,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["roll"].isTrue) {
-		Layout layout;
-		
-		try {
-			layout = getLayout(cmds["<layout>"].toString);
-		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
-			return;
-		}
-
 		auto data = "data.json".readText.parseJSON;
 
 		double total = 0;
@@ -525,15 +524,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["use"].isTrue) {
-		Layout layout;
-		
-		try {
-			layout = getLayout(cmds["<layout>"].toString);
-		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
-			return;
-		}
-
 		auto data = "data.json".readText.parseJSON;
 
 		writeln(layout.name);
@@ -544,15 +534,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["sfb"].isTrue) {
-		Layout layout;
-		
-		try {
-			layout = getLayout(cmds["<layout>"].toString);
-		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
-			return;
-		}
-
 		auto data = "data.json".readText.parseJSON;
 
 		int amount = 16;
@@ -575,7 +556,7 @@ void main(string[] args) {
 		double[string] scores;
 
 		foreach (e; layouts) {
-			auto layout = getLayout(e);
+			layout = getLayout(e, "rowstag");
 			scores[layout.name] = scoreLayout(layout, json);
 		}
 
@@ -585,15 +566,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["debug"].isTrue) {
-		Layout layout;
-		
-		try {
-			layout = getLayout(cmds["<layout>"].toString);
-		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
-			return;
-		}
-
 		string gram = cmds["<bigram>"].toString;
 
 		if (gram.length == 2) {

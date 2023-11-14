@@ -33,7 +33,7 @@ double scoreLayout(Layout layout, JSONValue json) {
 }
 
 void generate() {
-    auto layout = getLayout("qwerty");
+    auto layout = getLayout("qwerty", "rowstag");
 	auto json = "data.json".readText.parseJSON;
 	auto letters = layout.main.splitter.join;
 
