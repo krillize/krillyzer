@@ -44,10 +44,10 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer use mtgap` (shows the per finger use for mtgap)
 
 ### rank
-- `./krillyzer rank` (ranks all layouts according to the scoring algorithm)
+- `./krillyzer rank` (ranks all layouts according to the [scoring algorithm](https://github.com/krillize/krillyzer/tree/master#examples))
 
 ### gen
-- `./krillyzer gen` (generates a layout that scores well with the scoring algorithm)
+- `./krillyzer gen` (generates a layout that scores well with the [scoring algorithm](https://github.com/krillize/krillyzer/tree/master#examples))
 
 ### freq 
 - `./krillyzer freq lr` (shows the sfb and sfs frequency lr, rl, and the pair)
@@ -55,6 +55,9 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 ### debug
 - `./krillyzer debug graphite br` (shows a bunch of debug information for the bigram "br" on [graphite](https://github.com/rdavison/graphite-layout))
 - `./krillyzer debug graphite you` (shows a bunch of debug information for the trigram "you")
+
+## Scoring
+Currently, krillyzer uses a very crude scoring metric as a placeholder, simply sfbs and sfs weighted. For this reason the commands "rank" and "gen" are not ready for use.
 
 # Todo
 ### potential features 
