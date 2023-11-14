@@ -44,10 +44,10 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer use mtgap` (shows the per finger use for mtgap)
 
 ### rank
-- `./krillyzer rank` (ranks all layouts according to the [scoring algorithm](https://github.com/krillize/krillyzer/tree/master#scoring))
+- `./krillyzer rank` (ranks all layouts according to the [scoring algorithm](#scoring))
 
 ### gen
-- `./krillyzer gen` (generates a layout that scores well with the [scoring algorithm](https://github.com/krillize/krillyzer/tree/master#scoring))
+- `./krillyzer gen` (generates a layout that scores well with the [scoring algorithm](#scoring))
 
 ### freq 
 - `./krillyzer freq lr` (shows the sfb and sfs frequency lr, rl, and the pair)
