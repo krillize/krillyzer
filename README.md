@@ -1,3 +1,6 @@
+# Krillyzer
+![semimak stats](images/semimak-stats.png)
+
 # How to use
 ## Installation
 Krillyzer is written in dlang. The compiler can be installed from the [dlang website](https://dlang.org/download.html). You'll also want to make sure you get dlang's package manager [dub](https://github.com/dlang/dub#installation). Once you've installed dub you can run the command dub in the krillyzer folder to compile it and then run the resulting executable.
