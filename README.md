@@ -11,7 +11,7 @@ Krillyzer is written in dlang. The compiler can be installed from the [dlang web
 Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summary:
 - the first word on a line is the name of the program
 - the second word is the command
-- <\<word\> is a positional argument
+- \<word\> is a positional argument
 - [--word] is an optional flag
 - [--word=value] is an optional flag with a value
 - (a | b) means either a or b
