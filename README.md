@@ -68,7 +68,6 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 
 ### potential stats
 - roll ratio
-- center column use
 - finger speed
 
 ### optimizations
