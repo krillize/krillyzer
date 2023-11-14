@@ -291,11 +291,16 @@ void main(string[] args) {
 
 			auto pos = layout.keys[k];
 
+			if ([4, 5].canFind(pos.col)) {
+				raw["center"] += v;
+				continue;
+			}
+
 			if (pos.row == 0) {
 				raw["top"] += v;
 			}
 
-			if (pos.row == 1 && ![4, 5].canFind(pos.col)) {
+			if (pos.row == 1) {
 				raw["home"] += v;
 			}
 
@@ -447,6 +452,7 @@ void main(string[] args) {
 		"  Top    %6.3f%%".writefln(raw["top"] / mtotal * 100);
 		"  Home   %6.3f%%".writefln(raw["home"] / mtotal * 100);
 		"  Bottom %6.3f%%".writefln(raw["bottom"] / mtotal * 100);
+		"  Center %6.3f%%".writefln(raw["center"] / mtotal * 100);
 
 		writeln();
 		showUse(layout, data);
