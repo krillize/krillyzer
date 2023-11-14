@@ -1,3 +1,6 @@
+# Krillyzer
+![semimak stats](images/semimak-stats.png)
+
 # How to use
 ## Installation
 Krillyzer is written in dlang. The compiler can be installed from the [dlang website](https://dlang.org/download.html). You'll also want to make sure you get dlang's package manager [dub](https://github.com/dlang/dub#installation). Once you've installed dub you can run the command dub in the krillyzer folder to compile it and then run the resulting executable.
@@ -8,9 +11,9 @@ Krillyzer is written in dlang. The compiler can be installed from the [dlang web
 Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summary:
 - the first word on a line is the name of the program
 - the second word is the command
-- a \<word\> is a positional argument
-- a [--word] is an optional flag
-- a [--word=value] is an optional flag with a value
+- \<word\> is a positional argument
+- [--word] is an optional flag
+- [--word=value] is an optional flag with a value
 - (a | b) means either a or b
 
 ## Examples
@@ -41,10 +44,10 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer use mtgap` (shows the per finger use for mtgap)
 
 ### rank
-- `./krillyzer rank` (ranks all layouts according to the scoring algorithm)
+- `./krillyzer rank` (ranks all layouts according to the [scoring algorithm](#scoring))
 
 ### gen
-- `./krillyzer gen` (generates a layout that scores well with the scoring algorithm)
+- `./krillyzer gen` (generates a layout that scores well with the [scoring algorithm](#scoring))
 
 ### freq 
 - `./krillyzer freq lr` (shows the sfb and sfs frequency lr, rl, and the pair)
@@ -52,6 +55,9 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 ### debug
 - `./krillyzer debug graphite br` (shows a bunch of debug information for the bigram "br" on [graphite](https://github.com/rdavison/graphite-layout))
 - `./krillyzer debug graphite you` (shows a bunch of debug information for the trigram "you")
+
+## Scoring
+Currently, krillyzer uses a very crude scoring metric as a placeholder, simply sfbs and sfs weighted. For this reason the commands "rank" and "gen" are not ready for use.
 
 # Todo
 ### potential features 
