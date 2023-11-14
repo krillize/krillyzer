@@ -43,8 +43,8 @@ void showUse(Layout layout, JSONValue data) {
 	
 	"%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
 	"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
 	"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
 	"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
 
 	writef("\n  ");
