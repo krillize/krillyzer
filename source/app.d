@@ -10,17 +10,16 @@ immutable string doc = "
 krillyzer
 
 Usage:
-  krillyzer list (layouts | corpora) [--contains=<string>]
-  krillyzer load <corpus> [--file]
-  krillyzer stats <layout> [--board=<board>]
-  krillyzer sfb <layout> [--dist] [--amount=<int>]
-  krillyzer roll <layout> [--relative]
-  krillyzer use <layout>
-  krillyzer freq <bigram> [--ignoreCase]
-  krillyzer rank
-  krillyzer gen
-  krillyzer debug <layout> <bigram>
-  krillyzer -h | --help
+  krillyzer   list    (layouts | corpora)   [--contains=<string>]
+  krillyzer   load    <corpus>              [--file]
+  krillyzer   stats   <layout>              [--board=<board>]
+  krillyzer   sfb     <layout>              [--dist] [--amount=<int>]
+  krillyzer   roll    <layout>              [--relative]
+  krillyzer   use     <layout>
+  krillyzer   rank
+  krillyzer   gen
+  krillyzer   freq    <bigram>              [--ignoreCase]
+  krillyzer   debug   <layout> <bigram>
 ";
 
 void showUse(Layout layout, JSONValue data) {
