@@ -1,1 +1,2 @@
+# available boards are in boards/
 board ortho
