@@ -54,7 +54,13 @@ void showUse(Layout layout, JSONValue data) {
 	"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
 	"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
 
-	writeln();
+	writeln("\n\nHand Balance");
+	"  Left   %6.3f%%".writefln((raw[0] + raw[1] + raw[2] + raw[3]) / total * 100);
+	"  Right  %6.3f%%".writefln((raw[6] + raw[7] + raw[8] + raw[9]) / total * 100);
+
+	if (4 in raw || 5 in raw) {
+		"  Thumb  %6.3f%%".writefln((raw.get(4, 0) + raw.get(5, 0)) / total * 100);
+	}
 }
 
 void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, bool worst = false) {

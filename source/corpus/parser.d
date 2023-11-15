@@ -55,6 +55,8 @@ void setCorpus(string corpus, bool file = true) {
         }
     }
 
+    monograms[" "] = 0;
+
     [
         "monograms":  monograms,
         "bigrams":    bigrams,
