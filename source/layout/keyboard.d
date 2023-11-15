@@ -12,9 +12,21 @@ struct Position {
 
     double x;
     double y;
-    
+
     Finger finger;
     Hand hand;
+
+    string toString() const @safe pure {
+        if (row == x && col == y) {
+            return "(%s, %s), F=%s, H=%s".format(
+                row, col, finger, hand
+            );
+        } else {
+            return "(%s, %s) => (%s, %s), F=%s, H=%s".format(
+                row, col, x, y, finger, hand
+            );
+        }
+    }
 }
 
 struct Layout {
