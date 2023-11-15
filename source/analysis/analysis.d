@@ -11,8 +11,12 @@ struct Stat {
     double total = 0;
     string[] ngram;
 
-    double freq () {
+    double freq() {
         return count / total * 100;
+    }
+
+    double exists() {
+        return count != 0;
     }
 }
 

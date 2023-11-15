@@ -42,7 +42,7 @@ void showUse(Layout layout, JSONValue data) {
 	"  Left   %6.3f%%".writefln(raw["LH"].freq);
 	"  Right  %6.3f%%".writefln(raw["RH"].freq);
 
-	if (raw["thumb"].count != 0) {
+	if (raw["thumb"].exists) {
 		"  Thumb  %6.3f%%".writefln(raw["thumb"].freq);
 	}
 }
@@ -230,7 +230,7 @@ void main(string[] args) {
 
 	if (cmds["stats"].isTrue) {
 		auto data = "data.json".readText.parseJSON;
-		
+
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
