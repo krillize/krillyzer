@@ -539,7 +539,7 @@ void main(string[] args) {
 		}
 
 		foreach (k, v; scores.byPair.array.sort!"a[1] > b[1]") {
-			"%-14s %.3f".writefln(k, v);
+			"%-25s %6.3f".writefln(k, v);
 		}
 	}
 
