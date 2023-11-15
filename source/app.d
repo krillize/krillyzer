@@ -230,11 +230,7 @@ void main(string[] args) {
 
 	if (cmds["stats"].isTrue) {
 		auto data = "data.json".readText.parseJSON;
-
-		foreach(k, v; layout.getMono) {
-			"%s %s".writefln(k, v);
-		}
-
+		
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
