@@ -42,21 +42,21 @@ void showUse(Layout layout, JSONValue data) {
 	}
 	
 	"%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
-	"L %-11s".writef("%5.2f%%".format(raw[3] / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw[2] / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw[1] / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw[0] / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw.get(3, 0) / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw.get(2, 0) / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw.get(1, 0) / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw.get(0, 0) / total * 100));
 
 	writef("\n  ");
 
-	"R %-11s".writef("%5.2f%%".format(raw[6] / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw[8] / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw[7] / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw[9] / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw.get(6, 0) / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw.get(8, 0) / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw.get(7, 0) / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw.get(9, 0) / total * 100));
 
 	writeln("\n\nHand Balance");
-	"  Left   %6.3f%%".writefln((raw[0] + raw[1] + raw[2] + raw[3]) / total * 100);
-	"  Right  %6.3f%%".writefln((raw[6] + raw[7] + raw[8] + raw[9]) / total * 100);
+	"  Left   %6.3f%%".writefln((raw.get(0, 0) + raw.get(1, 0) + raw.get(2, 0) + raw.get(3, 0)) / total * 100);
+	"  Right  %6.3f%%".writefln((raw.get(6, 0) + raw.get(7, 0) + raw.get(8, 0) + raw.get(9, 0)) / total * 100);
 
 	if (4 in raw || 5 in raw) {
 		"  Thumb  %6.3f%%".writefln((raw.get(4, 0) + raw.get(5, 0)) / total * 100);
@@ -103,10 +103,10 @@ void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, 
 	}
 	
 	"SFB %.3f%%".writefln(raw.values.sum / total * 100);
-	"  Pinky  %.3f%%".writefln((raw[0] + raw[6]) / total * 100);
-	"  Ring   %.3f%%".writefln((raw[1] + raw[7]) / total * 100);
-	"  Middle %.3f%%".writefln((raw[2] + raw[8]) / total * 100);
-	"  Index  %.3f%%".writefln((raw[3] + raw[9]) / total * 100);
+	"  Pinky  %.3f%%".writefln((raw.get(0, 0) + raw.get(6, 0)) / total * 100);
+	"  Ring   %.3f%%".writefln((raw.get(1, 0) + raw.get(7, 0)) / total * 100);
+	"  Middle %.3f%%".writefln((raw.get(2, 0) + raw.get(8, 0)) / total * 100);
+	"  Index  %.3f%%".writefln((raw.get(3, 0) + raw.get(9, 0)) / total * 100);
 
 	if (worst) {
 		sfbs.sort!((a, b) => bigrams[a].get!double > bigrams[b].get!double).take(3);
@@ -402,9 +402,9 @@ void main(string[] args) {
 		}
 
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
-		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"] / btotal * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"] / stotal * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw["lsb"] / btotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw.get("sfb", 0) / btotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw.get("sfs", 0) / stotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw.get("lsb", 0) / btotal * 100));
 
 		writef("\n  ");
 
@@ -418,20 +418,20 @@ void main(string[] args) {
 		// "  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
 		// "  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
 
-		"\n\nRolls %.3f%%".writefln(raw["rolls"] / ttotal * 100);
-		"  Inroll   %.3f%%".writefln(raw["inroll"] /  ttotal * 100);
-		"  Outroll  %.3f%%".writefln(raw["outroll"] / ttotal * 100);
+		"\n\nRolls %.3f%%".writefln(raw.get("rolls", 0) / ttotal * 100);
+		"  Inroll   %.3f%%".writefln(raw.get("inroll", 0) /  ttotal * 100);
+		"  Outroll  %.3f%%".writefln(raw.get("outroll", 0) / ttotal * 100);
 
 		writeln("\nTrigrams");
-		"  Alternates %6.3f%%".writefln(raw["alt"] / ttotal * 100);
-		"  Redirects  %6.3f%%".writefln(raw["red"] / ttotal * 100);
-		"  Onehands   %6.3f%%".writefln(raw["one"] / ttotal * 100);
+		"  Alternates %6.3f%%".writefln(raw.get("alt", 0) / ttotal * 100);
+		"  Redirects  %6.3f%%".writefln(raw.get("red", 0) / ttotal * 100);
+		"  Onehands   %6.3f%%".writefln(raw.get("one", 0) / ttotal * 100);
 
 		writeln("\nRows");
-		"  Top    %6.3f%%".writefln(raw["top"] / mtotal * 100);
-		"  Home   %6.3f%%".writefln(raw["home"] / mtotal * 100);
-		"  Bottom %6.3f%%".writefln(raw["bottom"] / mtotal * 100);
-		"  Center %6.3f%%".writefln(raw["center"] / mtotal * 100);
+		"  Top    %6.3f%%".writefln(raw.get("top", 0) / mtotal * 100);
+		"  Home   %6.3f%%".writefln(raw.get("home", 0) / mtotal * 100);
+		"  Bottom %6.3f%%".writefln(raw.get("bottom", 0) / mtotal * 100);
+		"  Center %6.3f%%".writefln(raw.get("center", 0) / mtotal * 100);
 
 		writeln();
 		showUse(layout, data);
@@ -500,11 +500,11 @@ void main(string[] args) {
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
-		"\nRolls %.3f%%".writefln(raw["rolls"] / total * 100);
-		"  Inroll   %.3f%%".writefln(raw["inroll"] /  rtotal * 100);
-		"  Outroll  %.3f%%".writefln(raw["outroll"] / rtotal * 100);
-		"  Adjacent %.3f%%".writefln(raw["adroll"] /  rtotal * 100);
-		"  Same Row %.3f%%".writefln(raw["rowroll"] / rtotal * 100);
+		"\nRolls %.3f%%".writefln(raw.get("rolls", 0) / total * 100);
+		"  Inroll   %.3f%%".writefln(raw.get("inroll", 0) /  rtotal * 100);
+		"  Outroll  %.3f%%".writefln(raw.get("outroll", 0) / rtotal * 100);
+		"  Adjacent %.3f%%".writefln(raw.get("adroll", 0) /  rtotal * 100);
+		"  Same Row %.3f%%".writefln(raw.get("rowroll", 0) / rtotal * 100);
 	}
 
 	if (cmds["use"].isTrue) {
