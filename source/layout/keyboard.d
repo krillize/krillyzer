@@ -7,8 +7,12 @@ enum Hand   {Left, Right}
 enum Row    {top, home, bottom}
 
 struct Position {
-    double row;
-    double col;
+    int row;
+    int col;
+
+    double x;
+    double y;
+    
     Finger finger;
     Hand hand;
 }

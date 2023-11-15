@@ -19,7 +19,7 @@ Usage:
   krillyzer   rank
   krillyzer   gen
   krillyzer   freq    <bigram>              [--ignoreCase]
-  krillyzer   debug   <layout> <bigram>
+  krillyzer   debug   <layout> <bigram>     [--board=<board>]
 ";
 
 void showUse(Layout layout, JSONValue data) {

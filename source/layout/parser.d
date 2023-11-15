@@ -117,6 +117,8 @@ Layout getLayout(string name, string boardname) {
 
         Position pos = Position(
             row,
+            col,
+            row + coff[min(row, coff.length.to!int - 1)],
             col + roff[min(row, roff.length.to!int - 1)],
             (finger - '0').to!Finger,
             ((finger - '0') > 4).to!Hand

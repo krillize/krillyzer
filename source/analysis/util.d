@@ -80,11 +80,11 @@ int direction(Position[] pos) {
 }
 
 double distHorizontal(Position[] pos) {
-    return abs(pos[0].col - pos[1].col);
+    return abs(pos[0].y - pos[1].y);
 }
 
 double distVertical(Position[] pos) {
-    return abs(pos[0].row - pos[1].row);
+    return abs(pos[0].x - pos[1].x);
 }
 
 double distance(Position[] pos) {
