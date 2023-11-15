@@ -64,6 +64,7 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 ### potential features 
 - add more stats
 - add sorting by stat
+- common bigrams by stat
 - add colstag support
 - add generator features like config and trigram stats
 
