@@ -137,16 +137,20 @@ void debugBigram(Layout layout, string gram) {
 	"%s %s".writefln(gram[1], pos[1]);
 
 	writeln("\nflags");
-	"  repeat      %2d".writefln(pos.isRepeat);
-	"  sameFinger  %2d".writefln(pos.sameFinger);
-	"  sameHand    %2d".writefln(pos.sameHand);
-	"  isAdjacent  %2d".writefln(pos.isAdjacent);
+	"  repeat        %2d".writefln(pos.isRepeat);
+	"  sameFinger    %2d".writefln(pos.sameFinger);
+	"  sameHand      %2d".writefln(pos.sameHand);
+	"  isAdjacent    %2d".writefln(pos.isAdjacent);
 
 	writeln("\nvalues");
 	"  direction     %2d".writefln(pos.direction);
 	"  horizontal  %2.2f".writefln(pos.distHorizontal);
 	"  vertical    %2.2f".writefln(pos.distVertical);
 	"  distance    %2.2f".writefln(pos.distance);
+
+	writeln("\nstats");
+	"  sfb           %2d".writefln(pos.isSFB);
+	"  lsb           %2d".writefln(pos.isLSB);
 }
 
 void debugTrigram(Layout layout, string gram) {
