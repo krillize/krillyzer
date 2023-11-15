@@ -5,19 +5,29 @@ import std;
 import layout.keyboard;
 import parsing;
 
+string getBasename(string path) {
+    return path.to!string.splitter("/").array[$ - 1][0 .. $ - 4];
+}
+
 string[] getLayouts() {
     return "layouts".dirEntries("*.txt", SpanMode.depth)
         .map!(x => x.to!string.splitter("/").array[$ - 1][0 .. $ - 4]).array;
 }
 
 Layout getLayout(string name, string boardname) {
-    auto layouts = "layouts".dirEntries("*%s.txt".format(name), SpanMode.depth).array;
+    auto layouts = "layouts".dirEntries("*.txt", SpanMode.depth).array;
+    auto target = layouts.minElement!(x => 
+        levenshteinDistance(name, x.getBasename)
+    );
+
+    enforce!ParserException(
+        levenshteinDistance(name, target.getBasename) == 0,
+        "layout \"%s\" not found, did you mean %s?".format(name, target.getBasename)
+    );
+
     auto boards = "boards".dirEntries("*%s.txt".format(boardname), SpanMode.depth).array;
 
-    enforce!ParserException(!layouts.empty, 
-        "layout \"%s\" not found...".format(name)
-    );
-    string[string] data = parseFile(layouts[0].File);
+    string[string] data = parseFile(target.File);
     string[string] board = parseFile(boards[0].File);
 
     auto missing = ["main", "format", "name"].filter!(x => !(x in data));

@@ -197,7 +197,7 @@ void main(string[] args) {
 		try {
 			layout = getLayout(cmds["<layout>"].toString, board);
 		} catch (ParserException e) {
-			"Error in layout file: %s".writefln(e.msg);
+			"Error: %s".writefln(e.msg);
 			return;
 		}
 	}
