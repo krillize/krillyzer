@@ -51,6 +51,7 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 
 ### freq 
 - `./krillyzer freq lr` (shows the sfb and sfs frequency lr, rl, and the pair)
+- `./krillyzer freq th --ignoreCase` (counts Th and tH as th and Ht and hT as ht)
 
 ### debug
 - `./krillyzer debug graphite br` (shows a bunch of debug information for the bigram "br" on [graphite](https://github.com/rdavison/graphite-layout))
