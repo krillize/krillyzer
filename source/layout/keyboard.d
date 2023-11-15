@@ -18,12 +18,12 @@ struct Position {
 
     string toString() const @safe pure {
         if (row == x && col == y) {
-            return "(%s, %s), F=%s".format(
-                row, col, finger
+            return "F=%s, (%s, %s)".format(
+                finger, row, col
             );
         } else {
-            return "(%s, %s) => (%s, %s), F=%s".format(
-                row, col, x, y, finger
+            return "F=%s, (%s, %s) => (%s, %s)".format(
+                finger, row, col, x, y
             );
         }
     }
