@@ -1,2 +1,2 @@
 # available boards are in boards/
-board ortho
+board rowstag

@@ -23,43 +23,27 @@ Usage:
 ";
 
 void showUse(Layout layout, JSONValue data) {
-	auto monograms = data["monograms"];
-
-	double total = 0;
-	double[int] raw;
-
-	foreach (e; monograms.object.byKeyValue) {
-		dchar k = e.key.to!dchar;
-		double v = e.value.get!double;
-
-		total += v;
-
-		if (!(k in layout.keys)) {
-			continue;
-		}
-
-		raw[layout.keys[k].finger] += v;
-	}
+	auto raw = layout.getMono(data);
 	
 	"%-12s %-12s %-12s %-12s\n  ".writef("Index", "Middle", "Ring", "Pinky");
-	"L %-11s".writef("%5.2f%%".format(raw.get(3, 0) / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw.get(2, 0) / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw.get(1, 0) / total * 100));
-	"L %-11s".writef("%5.2f%%".format(raw.get(0, 0) / total * 100));
+	"L %-11s".writef("%5.2f%%".format(raw["LI"].freq));
+	"L %-11s".writef("%5.2f%%".format(raw["LM"].freq));
+	"L %-11s".writef("%5.2f%%".format(raw["LR"].freq));
+	"L %-11s".writef("%5.2f%%".format(raw["LP"].freq));
 
 	writef("\n  ");
 
-	"R %-11s".writef("%5.2f%%".format(raw.get(6, 0) / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw.get(8, 0) / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw.get(7, 0) / total * 100));
-	"R %-11s".writef("%5.2f%%".format(raw.get(9, 0) / total * 100));
+	"R %-11s".writef("%5.2f%%".format(raw["RI"].freq));
+	"R %-11s".writef("%5.2f%%".format(raw["RM"].freq));
+	"R %-11s".writef("%5.2f%%".format(raw["RR"].freq));
+	"R %-11s".writef("%5.2f%%".format(raw["RP"].freq));
 
 	writeln("\n\nHand Balance");
-	"  Left   %6.3f%%".writefln((raw.get(0, 0) + raw.get(1, 0) + raw.get(2, 0) + raw.get(3, 0)) / total * 100);
-	"  Right  %6.3f%%".writefln((raw.get(6, 0) + raw.get(7, 0) + raw.get(8, 0) + raw.get(9, 0)) / total * 100);
+	"  Left   %6.3f%%".writefln(raw["LH"].freq);
+	"  Right  %6.3f%%".writefln(raw["RH"].freq);
 
-	if (4 in raw || 5 in raw) {
-		"  Thumb  %6.3f%%".writefln((raw.get(4, 0) + raw.get(5, 0)) / total * 100);
+	if (raw["thumb"].count != 0) {
+		"  Thumb  %6.3f%%".writefln(raw["thumb"].freq);
 	}
 }
 
@@ -246,6 +230,10 @@ void main(string[] args) {
 
 	if (cmds["stats"].isTrue) {
 		auto data = "data.json".readText.parseJSON;
+
+		foreach(k, v; layout.getMono) {
+			"%s %s".writefln(k, v);
+		}
 
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));

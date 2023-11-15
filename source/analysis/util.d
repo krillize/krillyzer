@@ -4,41 +4,6 @@ import std;
 
 import layout.keyboard;
 
-bool isPinky(Position[] pos) {
-    return (
-        [0, 9].canFind(pos[0].finger) ||
-        [0, 9].canFind(pos[1].finger) 
-    );
-}
-
-bool isRing(Position[] pos) {
-    return (
-        [1, 8].canFind(pos[0].finger) ||
-        [1, 8].canFind(pos[1].finger) 
-    );
-}
-
-bool isMiddle(Position[] pos) {
-    return (
-        [2, 7].canFind(pos[0].finger) ||
-        [2, 7].canFind(pos[1].finger) 
-    );
-}
-
-bool isIndex(Position[] pos) {
-    return (
-        [3, 6].canFind(pos[0].finger) ||
-        [3, 6].canFind(pos[1].finger) 
-    );
-}
-
-bool isThumb(Position[] pos) {
-    return (
-        [4, 5].canFind(pos[0].finger) ||
-        [4, 5].canFind(pos[1].finger) 
-    );
-}
-
 bool isRepeat(Position[] pos) {
     return pos[0] == pos[1];
 }

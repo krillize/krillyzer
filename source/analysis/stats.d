@@ -5,6 +5,103 @@ import std;
 import layout.keyboard;
 import analysis.util;
 
+// monogram row stats
+bool isCenter(Position pos) {
+    return [4, 5].canFind(pos.col);
+}
+
+bool isTop(Position pos) {
+    return !pos.isCenter && pos.row == 0;
+}
+
+bool isHome(Position pos) {
+    return !pos.isCenter && pos.row == 1;
+}
+
+bool isBottom(Position pos) {
+    return !pos.isCenter && pos.row == 2;
+}
+
+// monogram finger stats
+bool isLP(Position pos) {
+    return pos.finger == 0;
+}
+
+bool isLR(Position pos) {
+    return pos.finger == 1;
+}
+
+bool isLM(Position pos) {
+    return pos.finger == 2;
+}
+
+bool isLI(Position pos) {
+    return pos.finger == 3;
+}
+
+bool isLT(Position pos) {
+    return pos.finger == 4;
+}
+
+bool isRT(Position pos) {
+    return pos.finger == 5;
+}
+
+bool isRI(Position pos) {
+    return pos.finger == 6;
+}
+
+bool isRM(Position pos) {
+    return pos.finger == 7;
+}
+
+bool isRR(Position pos) {
+    return pos.finger == 8;
+}
+
+bool isRP(Position pos) {
+    return pos.finger == 9;
+}
+
+bool isPinky(Position pos) {
+    return pos.isLP || pos.isRP;
+}
+
+bool isRing(Position pos) {
+    return pos.isLR || pos.isRR;
+}
+
+bool isMiddle(Position pos) {
+    return pos.isLM || pos.isRM;
+}
+
+bool isIndex(Position pos) {
+    return pos.isLI || pos.isRI;
+}
+
+bool isThumb(Position pos) {
+    return pos.isLT || pos.isRT;
+}
+
+bool isLH(Position pos) {
+    return (
+        pos.isLP ||
+        pos.isLR ||
+        pos.isLM ||
+        pos.isLI
+    );
+}
+
+bool isRH(Position pos) {
+    return (
+        pos.isRP ||
+        pos.isRR ||
+        pos.isRM ||
+        pos.isRI
+    );
+}
+
+// bigram stats
 bool isSFB(Position[] pos) {
 	return (
         !pos.isRepeat &&
@@ -27,6 +124,7 @@ double distLSB(Position[] pos) {
     return pos.isLSB * pos.distance;
 }
 
+// trigram stats
 bool isAlternate(Position[] pos) {
     return (
         (!pos[0 .. 2].sameHand) &&

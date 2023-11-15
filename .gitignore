@@ -13,3 +13,5 @@ krillyzer-test-*
 *.o
 *.obj
 *.lst
+
+layouts/krillize
