@@ -10,7 +10,7 @@ immutable string doc = "
 krillyzer
 
 Usage:
-  krillyzer   list    (layouts | corpora)   [--contains=<string>]
+  krillyzer   list    (layouts | corpora)   [--contains=<string>]             
   krillyzer   load    <corpus>              [--file]
   krillyzer   stats   <layout>              [--board=<board>]
   krillyzer   sfb     <layout>              [--dist] [--amount=<int>]
@@ -139,7 +139,7 @@ void main(string[] args) {
 	Layout layout;
 	if (cmds["<layout>"].isString) {
 		try {
-			layout = getLayout(cmds["<layout>"].toString, board);
+			layout = findLayout(cmds["<layout>"].toString, board);
 		} catch (ParserException e) {
 			"Error: %s".writefln(e.msg);
 			return;
@@ -163,7 +163,7 @@ void main(string[] args) {
 		}
 
 		if (cmds["layouts"].isTrue) {
-			items = getLayouts;
+			items = getLayouts.map!(x => x.getBasename).array;
 			msg = "List of Layouts:";
 		}
 
@@ -172,8 +172,9 @@ void main(string[] args) {
 			items = items.filter!(x => x.canFind(str)).array;
 		}
 
-		writeln(msg);
 		items.sort;
+
+		writeln(msg);
 		items.each!(x => "  %s".writefln(x));
 	}
 

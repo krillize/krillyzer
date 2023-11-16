@@ -2,7 +2,7 @@ module corpus.parser;
 
 import std;
 
-auto getCorpora() {
+string[] getCorpora() {
     return "corpora".dirEntries("*.txt", SpanMode.depth)
         .map!(x => x[8 .. $-4]).array;
 }

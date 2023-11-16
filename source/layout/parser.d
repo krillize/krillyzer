@@ -9,25 +9,28 @@ string getBasename(string path) {
     return path.baseName[0 .. $ - 4];
 }
 
-string[] getLayouts() {
-    return "layouts".dirEntries("*.txt", SpanMode.depth)
-        .map!(x => x.getBasename).array;
+auto getLayouts() {
+    return "layouts".dirEntries("*.txt", SpanMode.depth).map!(x => x.to!string).array;
 }
 
-Layout getLayout(string name, string boardname) {
+Layout findLayout(string name, string boardname) {
     auto layouts = "layouts".dirEntries("*.txt", SpanMode.depth).array;
-    auto target = layouts.minElement!(x => 
+    auto path = layouts.minElement!(x => 
         levenshteinDistance(name, x.getBasename)
     );
 
     enforce!ParserException(
-        levenshteinDistance(name, target.getBasename) == 0,
-        "layout \"%s\" not found, did you mean %s?".format(name, target.getBasename)
+        levenshteinDistance(name, path.getBasename) == 0,
+        "layout \"%s\" not found, did you mean %s?".format(name, path.getBasename)
     );
 
+    return getLayout(path, boardname);
+}
+
+Layout getLayout(string path, string boardname) {
     auto boards = "boards".dirEntries("*%s.txt".format(boardname), SpanMode.depth).array;
 
-    string[string] data = parseFile(target.File);
+    string[string] data = parseFile(path.File);
     string[string] board = parseFile(boards[0].File);
 
     auto missing = ["main", "format", "name"].filter!(x => !(x in data));
@@ -136,6 +139,10 @@ Layout getLayout(string name, string boardname) {
 
         keys[ch] = pos;
         keys[sh] = pos;
+
+        if (pos.finger == 4 || pos.finger == 5) {
+            layout.hasThumb = true;
+        }
     }
 
     layout.keys = keys;

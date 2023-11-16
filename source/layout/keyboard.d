@@ -33,13 +33,11 @@ struct Layout {
     string name;
     string date;
     string format;
-
     string[] authors;
     string source;
-
     string desc;
-
     string main;
+    bool hasThumb;
     
     Position[dchar] keys;
 
