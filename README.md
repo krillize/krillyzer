@@ -62,6 +62,8 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 
 # Todo
 ### potential features 
+- color display
+- shai and "monkeyracer" corpus
 - add more stats
 - add sorting by stat
 - common bigrams by stat
