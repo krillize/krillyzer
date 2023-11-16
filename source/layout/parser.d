@@ -6,12 +6,12 @@ import layout.keyboard;
 import parsing;
 
 string getBasename(string path) {
-    return path.to!string.splitter("/").array[$ - 1][0 .. $ - 4];
+    return path.baseName[0 .. $ - 4];
 }
 
 string[] getLayouts() {
     return "layouts".dirEntries("*.txt", SpanMode.depth)
-        .map!(x => x.to!string.splitter("/").array[$ - 1][0 .. $ - 4]).array;
+        .map!(x => x.getBasename).array;
 }
 
 Layout getLayout(string name, string boardname) {
