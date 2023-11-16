@@ -73,6 +73,3 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 ### potential stats
 - roll ratio
 - finger speed
-
-### optimizations
-- fix implementation of ngram parsing (currently converts the string to an array to fix utf-8 bug, very slow)

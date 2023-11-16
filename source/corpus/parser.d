@@ -17,7 +17,7 @@ void setCorpus(string corpus, bool file = true) {
 
     writeln("Processing data...");
 
-    dchar[] text = path.readText.array;
+    string text = path.readText;
 
     double[string] monograms;
     double[string] bigrams;
@@ -25,37 +25,58 @@ void setCorpus(string corpus, bool file = true) {
     double[string] skipgrams;
     double[string] speedgrams;
 
-    foreach (i; 0 .. text.length) {
-        monograms[text[i].to!string]++;
+    int back;
+    int front;
 
-        foreach (j; 0 .. 4) {
-            if (i + j + 2 > text.length) {
+    foreach (_; 0 .. 5) {
+        front += std.utf.stride(text, front);
+    }
+
+    while (front < text.length) {
+        string window = text[back .. front];
+
+        back += std.utf.stride(text, back);
+        front += std.utf.stride(text, front);
+
+        foreach (i; 0 .. 3) {
+            if (window[window.toUTFindex(i) .. window.toUTFindex(i+1)] == " ") {
                 break;
             }
 
-            string gram = [text[i], text[i + j + 1]].to!string;
+            string gram = window[0 .. window.toUTFindex(i + 1)];
 
-            if (gram.canFind(' ')) {
-                continue;
+            if (i == 0) {
+                monograms[gram]++;
             }
 
-            if (j == 0) {
+            if (i == 1) {
                 bigrams[gram]++;
             }
 
-            if (j == 1) {
-                skipgrams[gram]++;
+            if (i == 2) {
+                trigrams[gram]++;
+            }
+        }   
+
+        if (window[0 .. window.toUTFindex(1)] == " ") {
+            continue;
+        }
+
+        foreach (i; 1 .. 5) {
+            if (window[window.toUTFindex(i) .. window.toUTFindex(i+1)] == " ") {
+                continue;
             }
 
-            if (j == 1 && text[i + j] != ' ') {
-                trigrams[text[i .. i + 3].to!string]++;
-            }
+            string skip  = window[0 .. window.toUTFindex(1)];
+                   skip ~= window[window.toUTFindex(i) .. window.toUTFindex(i+1)];
+           
+            if (i == 2) {
+                skipgrams[skip]++;
+            }  
 
-            speedgrams[gram] += 1.0 / (j + 1).pow(2);
+            speedgrams[skip] += 1.0 / (i).pow(2);
         }
     }
-
-    monograms[" "] = 0;
 
     [
         "monograms":  monograms,
