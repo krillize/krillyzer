@@ -48,69 +48,29 @@ void showUse(Layout layout, JSONValue data) {
 }
 
 void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, bool worst = false) {
-	auto bigrams = data["bigrams"];
+	auto raw = layout.getBi(data, dist);
 	
-	double total = 0;
-	double[int] raw;
+	"SFB %.3f%%".writefln(raw["sfb"].freq);
+	"  Pinky  %.3f%%".writefln(raw["pinky-sfb"].freq);
+	"  Ring   %.3f%%".writefln(raw["ring-sfb"].freq);
+	"  Middle %.3f%%".writefln(raw["middle-sfb"].freq);
+	"  Index  %.3f%%".writefln(raw["index-sfb"].freq);
 
-	string[] sfbs; 
-	foreach (e; bigrams.object.byKeyValue) {
-		string k = e.key;
-		double v = e.value.get!double;
-		
-		total += v;
-
-		if (
-			!(k[0] in layout.keys) ||
-			!(k[1] in layout.keys)
-		) {
-			continue;
-		}
-
-		auto pos = k.map!(x => layout.keys[x]).array;
-
-		if (!pos.isSFB) {
-			continue;
-		}
-
-		foreach (i; 0 .. 10) {
-			double count = v * (pos[0].finger == i);
-
-			if (dist) {
-				count *= pos.distance;
-			}
-
-			raw[i] += count;
-		}
-
-		sfbs ~= k;
+	if(raw["thumb-sfb"].exists) {
+		"  Thumb  %.3f%%".writefln(raw["thumb-sfb"].freq);
 	}
-	
-	"SFB %.3f%%".writefln(raw.values.sum / total * 100);
-	"  Pinky  %.3f%%".writefln((raw.get(0, 0) + raw.get(6, 0)) / total * 100);
-	"  Ring   %.3f%%".writefln((raw.get(1, 0) + raw.get(7, 0)) / total * 100);
-	"  Middle %.3f%%".writefln((raw.get(2, 0) + raw.get(8, 0)) / total * 100);
-	"  Index  %.3f%%".writefln((raw.get(3, 0) + raw.get(9, 0)) / total * 100);
 
 	if (worst) {
-		sfbs.sort!((a, b) => bigrams[a].get!double > bigrams[b].get!double).take(3);
-
 		writeln("\nWorst");
-		foreach (row; sfbs.take(amount).chunks(4)) {
+		foreach (row; raw["sfb"].top(amount).chunks(4)) {
 			foreach (gram; row) {
-				auto pos = gram.map!(x => layout.keys[x]).array;
-				double count = bigrams[gram].get!double / total * 100;
-
-				if (dist) {
-					count *= pos.distance;
-				}
-
-				"  %s %-7s".writef(gram, "%.3f%%".format(count));
+				"  %s %-7s".writef(
+					gram, "%.3f%%".format(raw["sfb"].freq(gram))
+				);
 			}
 			writeln;
 		}
 	}
-
 }
 
 void debugBigram(Layout layout, string gram) {

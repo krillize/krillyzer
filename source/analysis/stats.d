@@ -6,84 +6,84 @@ import layout.keyboard;
 import analysis.util;
 
 // monogram row stats
-bool isCenter(Position pos) {
-    return [4, 5].canFind(pos.col);
+bool isCenter(Position[] pos) {
+    return [4, 5].canFind(pos[0].col);
 }
 
-bool isTop(Position pos) {
-    return !pos.isCenter && pos.row == 0;
+bool isTop(Position[] pos) {
+    return !pos.isCenter && pos[0].row == 0;
 }
 
-bool isHome(Position pos) {
-    return !pos.isCenter && pos.row == 1;
+bool isHome(Position[] pos) {
+    return !pos.isCenter && pos[0].row == 1;
 }
 
-bool isBottom(Position pos) {
-    return !pos.isCenter && pos.row == 2;
+bool isBottom(Position[] pos) {
+    return !pos.isCenter && pos[0].row == 2;
 }
 
 // monogram finger stats
-bool isLP(Position pos) {
-    return pos.finger == 0;
+bool isLP(Position[] pos) {
+    return pos[0].finger == 0;
 }
 
-bool isLR(Position pos) {
-    return pos.finger == 1;
+bool isLR(Position[] pos) {
+    return pos[0].finger == 1;
 }
 
-bool isLM(Position pos) {
-    return pos.finger == 2;
+bool isLM(Position[] pos) {
+    return pos[0].finger == 2;
 }
 
-bool isLI(Position pos) {
-    return pos.finger == 3;
+bool isLI(Position[] pos) {
+    return pos[0].finger == 3;
 }
 
-bool isLT(Position pos) {
-    return pos.finger == 4;
+bool isLT(Position[] pos) {
+    return pos[0].finger == 4;
 }
 
-bool isRT(Position pos) {
-    return pos.finger == 5;
+bool isRT(Position[] pos) {
+    return pos[0].finger == 5;
 }
 
-bool isRI(Position pos) {
-    return pos.finger == 6;
+bool isRI(Position[] pos) {
+    return pos[0].finger == 6;
 }
 
-bool isRM(Position pos) {
-    return pos.finger == 7;
+bool isRM(Position[] pos) {
+    return pos[0].finger == 7;
 }
 
-bool isRR(Position pos) {
-    return pos.finger == 8;
+bool isRR(Position[] pos) {
+    return pos[0].finger == 8;
 }
 
-bool isRP(Position pos) {
-    return pos.finger == 9;
+bool isRP(Position[] pos) {
+    return pos[0].finger == 9;
 }
 
-bool isPinky(Position pos) {
+bool isPinky(Position[] pos) {
     return pos.isLP || pos.isRP;
 }
 
-bool isRing(Position pos) {
+bool isRing(Position[] pos) {
     return pos.isLR || pos.isRR;
 }
 
-bool isMiddle(Position pos) {
+bool isMiddle(Position[] pos) {
     return pos.isLM || pos.isRM;
 }
 
-bool isIndex(Position pos) {
+bool isIndex(Position[] pos) {
     return pos.isLI || pos.isRI;
 }
 
-bool isThumb(Position pos) {
+bool isThumb(Position[] pos) {
     return pos.isLT || pos.isRT;
 }
 
-bool isLH(Position pos) {
+bool isLH(Position[] pos) {
     return (
         pos.isLP ||
         pos.isLR ||
@@ -92,7 +92,7 @@ bool isLH(Position pos) {
     );
 }
 
-bool isRH(Position pos) {
+bool isRH(Position[] pos) {
     return (
         pos.isRP ||
         pos.isRR ||
@@ -101,19 +101,34 @@ bool isRH(Position pos) {
     );
 }
 
-// bigram stats
+// sfb bigram stats
 bool isSFB(Position[] pos) {
-	return (
-        !pos.isRepeat &&
-        pos.sameFinger
-    );
+	return !pos.isRepeat && pos.sameFinger;
 }
 
+bool isPinkySFB(Position[] pos) {
+    return pos.isSFB && pos.isPinky;
+}
+
+bool isRingSFB(Position[] pos) {
+    return pos.isSFB && pos.isRing;
+}
+
+bool isMiddleSFB(Position[] pos) {
+    return pos.isSFB && pos.isMiddle;
+}
+
+bool isIndexSFB(Position[] pos) {
+    return pos.isSFB && pos.isIndex;
+}
+
+bool isThumbSFB(Position[] pos) {
+    return pos.isSFB && pos.isThumb;
+}
+
+// other bigram stats
 bool isLSB(Position[] pos) {
-    return (
-        pos.isAdjacent &&
-        pos.distHorizontal >= 2
-    );
+    return pos.isAdjacent && pos.distHorizontal >= 2;
 }
 
 double distSFB(Position[] pos) {
