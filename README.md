@@ -28,7 +28,7 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer load sometext.txt --file` (loads from the file "sometext.txt")
 
 ### stats
-- `./krillyzer stats semimak` (shows the stats for the layout [semimak](https://semilin.github.io/posts/Semimak.html)
+- `./krillyzer stats semimak` (shows the stats for the layout [semimak](https://semilin.github.io/posts/Semimak.html). It uses the default board defined in [config.txt](https://github.com/krillize/krillyzer/blob/master/config.txt))
 - `./krillyzer stats semimak --board=rowstag` (shows the stats for semimak with the rowstag board)
 
 ### sfb 
