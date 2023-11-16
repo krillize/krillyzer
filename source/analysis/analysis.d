@@ -14,7 +14,7 @@ struct Stat {
 
     double freq(string gram = null) {
         if (gram) {
-            return ngram[gram] / total * 100;
+            return ngram.get(gram, 0) / total * 100;
         } else {
             return count / total * 100;
         }
