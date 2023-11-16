@@ -1,2 +1,11 @@
 # available boards are in boards/
 board rowstag
+
+# these are the folders in layouts/ that will be
+# included in layout lists and rankings. 
+folders (
+    standard
+    angle
+    one-handed
+    thumb
+)

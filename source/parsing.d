@@ -21,7 +21,7 @@ string[string] parseFile(File file) {
 
         auto tokens = line.strip.splitter.array;
 
-        if (tokens[0] == "#") {
+        if (tokens[0].startsWith("#")) {
             continue;
         }
 

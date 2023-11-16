@@ -9,8 +9,10 @@ string getBasename(string path) {
     return path.baseName[0 .. $ - 4];
 }
 
-auto getLayouts() {
-    return "layouts".dirEntries("*.txt", SpanMode.depth).map!(x => x.to!string).array;
+auto getLayouts(string[] folders = []) {
+    return "layouts".dirEntries("*.txt", SpanMode.depth)
+        .filter!(x => folders.any!(y => x.pathSplitter.canFind(y)))
+        .map!(x => x.to!string).array;
 }
 
 Layout findLayout(string name, string boardname) {

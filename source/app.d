@@ -136,6 +136,8 @@ void main(string[] args) {
 		board = cmds["--board"].toString;
 	}
 
+	string[] folders = config["folders"].splitter("\n").array;
+
 	Layout layout;
 	if (cmds["<layout>"].isString) {
 		try {
@@ -163,7 +165,7 @@ void main(string[] args) {
 		}
 
 		if (cmds["layouts"].isTrue) {
-			items = getLayouts.map!(x => x.getBasename).array;
+			items = getLayouts(folders).map!(x => x.getBasename).array;
 			msg = "List of Layouts:";
 		}
 
@@ -479,7 +481,7 @@ void main(string[] args) {
 	}
 
 	if (cmds["rank"].isTrue) {
-		auto layouts = getLayouts();
+		auto layouts = getLayouts(folders);
 		auto json = "data.json".readText.parseJSON;
 
 		double[string] scores;
