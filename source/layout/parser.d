@@ -140,7 +140,10 @@ Layout getLayout(string path, string boardname) {
         );
 
         keys[ch] = pos;
-        keys[sh] = pos;
+
+        if (!layout.main.canFind(sh)) {
+            keys[sh] = pos;
+        }
 
         if (pos.finger == 4 || pos.finger == 5) {
             layout.hasThumb = true;
