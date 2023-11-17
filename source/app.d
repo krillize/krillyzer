@@ -435,8 +435,8 @@ void main(string[] args) {
 				double value = tokens[1][1 .. $].to!double;
 
 				if (
-					(comp == 'l' && stats[stat].freq > value) ||
-					(comp == 'g' && stats[stat].freq < value) ||
+					(comp == 'l' && stats[stat].freq >= value) ||
+					(comp == 'g' && stats[stat].freq <= value) ||
 					(comp == 'e' && stats[stat].freq != value)
 				) {
 					passes = false;
