@@ -17,6 +17,7 @@ Usage:
   krillyzer   roll    <layout>              [--relative]
   krillyzer   use     <layout>
   krillyzer   rank
+  krillyzer   sort    <stat>                [--asc]
   krillyzer   gen
   krillyzer   freq    <bigram>              [--ignoreCase]
   krillyzer   debug   <layout> <bigram>     [--board=<board>]
@@ -268,18 +269,48 @@ void main(string[] args) {
 
 	if (cmds["rank"].isTrue) {
 		auto layouts = getLayouts(folders);
-		auto json = "data.json".readText.parseJSON;
 
 		double[string] scores;
 
 		foreach (e; layouts) {
 			layout = getLayout(e, "rowstag");
-			scores[layout.name] = scoreLayout(layout, json);
+			scores[layout.name] = scoreLayout(layout, data);
 		}
 
 		foreach (k, v; scores.byPair.array.sort!"a[1] > b[1]") {
 			"%-25s %6.3f".writefln(k, v);
 		}
+	}
+
+	if (cmds["sort"].isTrue) {
+		auto layouts = getLayouts(folders);
+
+		string stat = cmds["<stat>"].toString;
+
+		double[string] scores;
+
+		foreach (e; layouts) {
+			layout = getLayout(e, "rowstag");
+			Stat[string] stats = layout.getStats(data);
+
+			if (!(stat in stats)) {
+				"Error: stat %s does not exist".writefln(stat);
+				return;
+			}
+
+			scores[layout.name] = stats[stat].freq;
+		}
+
+		if (cmds["--asc"].isTrue) {
+			foreach (k, v; scores.byPair.array.sort!"a[1] < b[1]") {
+				"%-25s %6.3f%%".writefln(k, v);
+			}
+		} else {
+			foreach (k, v; scores.byPair.array.sort!"a[1] > b[1]") {
+				"%-25s %6.3f%%".writefln(k, v);
+			}
+		}
+
 	}
 
 	if (cmds["debug"].isTrue) {
