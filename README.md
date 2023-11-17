@@ -37,6 +37,11 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer sfb qwerty --dist` (multiplies each sfb stat by distance)
 - `./krillyzer sfb qwerty --amount=32` (shows the top 32 most frequent sfbs)
 
+### stat
+- `./krillyzer stat qwerty index-sfb` (shows the frequeny and most common index sfbs on qwerty)
+- `./krillyzer stat qwerty sfb --dist` (shows the freq, dist, and weighted frequency of sfbs on qwerty as well as the most common sfbs )
+- `./krillyzer stat qwerty one --amount=32` (shows 32 of the most common onehands on qwerty)
+
 ### roll
 - `./krillyzer roll dvorak` (shows the roll stats for dvorak)
 - `./krillyzer roll dvorak --relative` (changes the roll stats to be out of total rolls instead of trigrams)
