@@ -50,14 +50,14 @@ void showUse(Layout layout, JSONValue data) {
 void showSFB(Layout layout, JSONValue data, int amount = 16, bool dist = false, bool worst = false) {
 	auto raw = layout.getBi(data, dist);
 	
-	"SFB %.3f%%".writefln(raw["sfb"].freq);
-	"  Pinky  %.3f%%".writefln(raw["pinky-sfb"].freq);
-	"  Ring   %.3f%%".writefln(raw["ring-sfb"].freq);
-	"  Middle %.3f%%".writefln(raw["middle-sfb"].freq);
-	"  Index  %.3f%%".writefln(raw["index-sfb"].freq);
+	"SFB %.3f%%".writefln(raw["sfb"].dist);
+	"  Pinky  %.3f%%".writefln(raw["pinky-sfb"].dist);
+	"  Ring   %.3f%%".writefln(raw["ring-sfb"].dist);
+	"  Middle %.3f%%".writefln(raw["middle-sfb"].dist);
+	"  Index  %.3f%%".writefln(raw["index-sfb"].dist);
 
 	if(raw["thumb-sfb"].exists) {
-		"  Thumb  %.3f%%".writefln(raw["thumb-sfb"].freq);
+		"  Thumb  %.3f%%".writefln(raw["thumb-sfb"].dist);
 	}
 
 	if (worst) {
@@ -148,6 +148,8 @@ void main(string[] args) {
 		}
 	}
 
+	JSONValue data = "data.json".readText.parseJSON;
+
 	if (cmds["load"].isTrue) {
 		setCorpus(
 			cmds["<corpus>"].toString,
@@ -192,271 +194,57 @@ void main(string[] args) {
 	}
 
 	if (cmds["stats"].isTrue) {
-		auto data = "data.json".readText.parseJSON;
+		auto raw = layout.getStats(data, true);
 
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
-		double mtotal = 0;
-		double btotal = 0;
-		double stotal = 0;
-		double ttotal = 0;
-		double ptotal = 0;
-
-		double[string] raw;
-
-		foreach (e; data["monograms"].object.byKeyValue) {
-			dchar k = e.key.to!dchar;
-			double v = e.value.get!double;
-
-			mtotal += v;
-
-			if (!(k in layout.keys)) {
-				continue;
-			}
-
-			auto pos = layout.keys[k];
-
-			if ([4, 5].canFind(pos.col)) {
-				raw["center"] += v;
-				continue;
-			}
-
-			if (pos.row == 0) {
-				raw["top"] += v;
-			}
-
-			if (pos.row == 1) {
-				raw["home"] += v;
-			}
-
-			if (pos.row == 2) {
-				raw["bottom"] += v;
-			}
-		}
-
-		foreach (e; data["bigrams"].object.byKeyValue) {
-			string k = e.key;
-			double v = e.value.get!double;
-
-			btotal += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (pos.isSFB) {
-				raw["sfb"] += v;
-				raw["sfb-dist"] += v * pos.distance;
-			}
-
-			if (pos.isLSB) {
-				raw["lsb"] += v;
-				raw["lsb-dist"] += v * pos.distance;
-			}
-		}
-
-		foreach (e; data["skipgrams"].object.byKeyValue) {
-			string k = e.key;
-			double v = e.value.get!double;
-
-			stotal += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (pos.isSFB) {
-				raw["sfs"] += v;
-				raw["sfs-dist"] += v * pos.distance;
-			}
-		}
-
-		foreach (e; data["trigrams"].object.byKeyValue) {
-			string k = e.key;
-			double v = e.value.get!double;
-
-			ttotal += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys) ||
-				!(k[2] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (pos.isAlternate) {
-				raw["alt"] += v;
-			}
-
-			if (pos.isRoll) {
-				raw["rolls"] += v; 
-			}
-
-			if (pos.isInroll) {
-				raw["inroll"] += v;
-			}
-
-			if (pos.isOutroll) {
-				raw["outroll"] += v;
-			}
-
-			if (pos.isRedirect) {
-				raw["red"] += v;
-			}
-
-			if (pos.isOnehand) {
-				raw["one"] += v;
-			}
-		}
-
-		foreach (e; data["speedgrams"].object.byKeyValue) {
-			string k = e.key;
-			double v = e.value.get!double;
-
-			ptotal += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (pos.isSFB) {
-				auto finger = pos[0].finger;
-				
-				raw[finger.to!string] += (
-					v * pos.distance.pow(0.65) * 
-					(1 / [1.5, 3.6, 4.8, 5.5, 0, 0, 5.5, 4.8, 3.6, 1.5][finger])
-				);
-			}
-		}
-
 		"\n%-16s %-16s %-16s\n  ".writef("SFB", "SFS", "LSB");
-		"Freq %-12s".writef("%6.3f%%".format(raw.get("sfb", 0) / btotal * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw.get("sfs", 0) / stotal * 100));
-		"Freq %-12s".writef("%6.3f%%".format(raw.get("lsb", 0) / btotal * 100));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfb"].freq));
+		"Freq %-12s".writef("%6.3f%%".format(raw["sfs"].freq));
+		"Freq %-12s".writef("%6.3f%%".format(raw["lsb"].freq));
 
 		writef("\n  ");
 
-		"Dist %-12s".writef("%6.3f".format(raw["sfb-dist"] / raw["sfb"]));
-		"Dist %-12s".writef("%6.3f".format(raw["sfs-dist"] / raw["sfs"]));
-		"Dist %-12s".writef("%6.3f".format(raw["lsb-dist"] / raw["lsb"]));
+		"Dist %-12s".writef("%6.3f".format(raw["sfb"].avgdist));
+		"Dist %-12s".writef("%6.3f".format(raw["sfs"].avgdist));
+		"Dist %-12s".writef("%6.3f".format(raw["lsb"].avgdist));
 
-		// writeln("\n\nFspeed");
-		// "  Pinky  %.3f".writefln((raw["LP"] + raw["RP"]) / ptotal * 100);
-		// "  Ring   %.3f".writefln((raw["LR"] + raw["RR"]) / ptotal * 100);
-		// "  Middle %.3f".writefln((raw["LM"] + raw["RM"]) / ptotal * 100);
-		// "  Index  %.3f".writefln((raw["LI"] + raw["RI"]) / ptotal * 100);
-
-		"\n\nRolls %.3f%%".writefln(raw.get("rolls", 0) / ttotal * 100);
-		"  Inroll   %.3f%%".writefln(raw.get("inroll", 0) /  ttotal * 100);
-		"  Outroll  %.3f%%".writefln(raw.get("outroll", 0) / ttotal * 100);
+		"\n\nRolls %.3f%%".writefln(raw["roll"].freq);
+		"  Inroll   %.3f%%".writefln(raw["inroll"].freq);
+		"  Outroll  %.3f%%".writefln(raw["outroll"].freq);
 
 		writeln("\nTrigrams");
-		"  Alternates %6.3f%%".writefln(raw.get("alt", 0) / ttotal * 100);
-		"  Redirects  %6.3f%%".writefln(raw.get("red", 0) / ttotal * 100);
-		"  Onehands   %6.3f%%".writefln(raw.get("one", 0) / ttotal * 100);
+		"  Alternates %6.3f%%".writefln(raw["alt"].freq);
+		"  Redirects  %6.3f%%".writefln(raw["red"].freq);
+		"  Onehands   %6.3f%%".writefln(raw["one"].freq);
 
 		writeln("\nRows");
-		"  Top    %6.3f%%".writefln(raw.get("top", 0) / mtotal * 100);
-		"  Home   %6.3f%%".writefln(raw.get("home", 0) / mtotal * 100);
-		"  Bottom %6.3f%%".writefln(raw.get("bottom", 0) / mtotal * 100);
-		"  Center %6.3f%%".writefln(raw.get("center", 0) / mtotal * 100);
+		"  Top    %6.3f%%".writefln(raw["top"].freq);
+		"  Home   %6.3f%%".writefln(raw["home"].freq);
+		"  Bottom %6.3f%%".writefln(raw["bottom"].freq);
+		"  Center %6.3f%%".writefln(raw["center"].freq);
 
 		writeln();
 		showUse(layout, data);
 	}
 
 	if (cmds["roll"].isTrue) {
-		auto data = "data.json".readText.parseJSON;
-
-		double total = 0;
-		double[string] raw;
-
-		foreach (e; data["trigrams"].object.byKeyValue) {
-			string k = e.key;
-			double v = e.value.get!double;
-
-			total += v;
-
-			if (
-				!(k[0] in layout.keys) ||
-				!(k[1] in layout.keys) ||
-				!(k[2] in layout.keys)
-			) {
-				continue;
-			}
-
-			auto pos = k.map!(x => layout.keys[x]).array;
-
-			if (pos.isAlternate) {
-				raw["alt"] += v;
-			}
-
-			if (pos.isAdjacentRoll) {
-				raw["adroll"] += v;
-			}
-
-			if (pos.isRoll) {
-				raw["rolls"] += v; 
-			}
-
-			if (pos.isRowRoll) {
-				raw["rowroll"] += v;
-			}
-
-			if (pos.isInroll) {
-				raw["inroll"] += v;
-			}
-
-			if (pos.isOutroll) {
-				raw["outroll"] += v;
-			}
-
-			if (pos.isRedirect) {
-				raw["red"] += v;
-			}
-
-			if (pos.isOnehand) {
-				raw["one"] += v;
-			}
-		}
-
-		double rtotal = total;
-		if (cmds["--relative"].isTrue) {
-			rtotal = raw["rolls"];
-		}
+		auto raw = layout.getTri(data);
 
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 
-		"\nRolls %.3f%%".writefln(raw.get("rolls", 0) / total * 100);
-		"  Inroll   %.3f%%".writefln(raw.get("inroll", 0) /  rtotal * 100);
-		"  Outroll  %.3f%%".writefln(raw.get("outroll", 0) / rtotal * 100);
-		"  Adjacent %.3f%%".writefln(raw.get("adroll", 0) /  rtotal * 100);
-		"  Same Row %.3f%%".writefln(raw.get("rowroll", 0) / rtotal * 100);
+		double total = cmds["--relative"].isTrue ? raw["roll"].count : raw["roll"].total;
+
+		"\nRolls %.3f%%".writefln(raw["roll"].freq);
+		"  Inroll   %.3f%%".writefln(raw["inroll"].count / total * 100);
+		"  Outroll  %.3f%%".writefln(raw["outroll"].count / total * 100);
+		"  Adjacent %.3f%%".writefln(raw["adroll"].count / total * 100);
+		"  Same Row %.3f%%".writefln(raw["rowroll"].count / total * 100);
 	}
 
 	if (cmds["use"].isTrue) {
-		auto data = "data.json".readText.parseJSON;
-
 		writeln(layout.name);
 		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
 		writeln();
@@ -465,8 +253,6 @@ void main(string[] args) {
 	}
 
 	if (cmds["sfb"].isTrue) {
-		auto data = "data.json".readText.parseJSON;
-
 		int amount = 16;
 		if (cmds["--amount"].isString) {
 			string str = cmds["--amount"].toString;

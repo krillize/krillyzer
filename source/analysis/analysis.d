@@ -8,7 +8,7 @@ import analysis.util;
 
 struct Stat {
     double count = 0;
-    double dist = 0;
+    double distance = 0;
     double total = 0;
     double[string] ngram;
 
@@ -18,6 +18,14 @@ struct Stat {
         } else {
             return count / total * 100;
         }
+    }
+
+    double avgdist() {
+        return distance / count;
+    }
+
+    double dist() {
+        return distance / total * 100;
     }
 
     auto top(int n) {
@@ -40,11 +48,12 @@ Stat[string] countStats(Layout layout, JSONValue json, bool function(Position[])
         string k = e.key;
         double v = e.value.get!double;
 
-        total += v;
-
         if (!k.all!(x => x in layout.keys)) {
+            total += v;
             continue;
         }
+        
+        total += v;
 
         Position[] pos = k.map!(x => layout.keys[x]).array;
         foreach(stat, fn; stats) {
@@ -53,13 +62,37 @@ Stat[string] countStats(Layout layout, JSONValue json, bool function(Position[])
             }
 
             double dmult = dist ? pos.distance : 1;
+
             res[stat].ngram[k] = v * dmult;
-            res[stat].count += v * dmult;
+            res[stat].distance += v * dmult;
+            res[stat].count += v;
         }
     }
 
     foreach(ref v; res.byValue) {
         v.total = total;
+    }
+
+    return res;
+}
+
+Stat[string] getStats(Layout layout, JSONValue json = "data.json".readText.parseJSON, bool dist = false) {
+    Stat[string] res;
+    
+    foreach (k, v; layout.getMono(json)) {
+        res[k] = v;
+    }
+
+    foreach (k, v; layout.getBi(json, dist)) {
+        res[k] = v;
+    }
+
+    foreach (k, v; layout.getSkip(json, dist)) {
+        res[k] = v;
+    }
+
+    foreach (k, v; layout.getTri(json)) {
+        res[k] = v;
     }
 
     return res;
@@ -105,4 +138,24 @@ Stat[string] getBi(Layout layout, JSONValue json = "data.json".readText.parseJSO
         "index-sfb":  &isIndexSFB, 
         "thumb-sfb":  &isThumbSFB,   
     ], dist);
+}
+
+Stat[string] getSkip(Layout layout, JSONValue json = "data.json".readText.parseJSON, bool dist = false) {
+    return layout.countStats(json["skipgrams"], [
+        "sfs":        &isSFB,
+    ], dist);
+}
+
+Stat[string] getTri(Layout layout, JSONValue json = "data.json".readText.parseJSON) {
+    return layout.countStats(json["trigrams"], [
+        "roll":    &isRoll,
+        "adroll":  &isAdjacentRoll,
+        "rowroll": &isRowRoll,
+        "inroll":  &isInroll,
+        "outroll": &isOutroll,
+        
+        "alt":     &isAlternate,
+        "red":     &isRedirect,
+        "one":     &isOnehand,
+    ]);
 }
