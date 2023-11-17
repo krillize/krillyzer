@@ -20,6 +20,7 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 ### list
 - `./krillyzer list layouts` (a list of all layouts)
 - `./krillyzer list corpora` (a list of all corpora)
+- `./krillyzer list stats` (a list of all stats)
 - `./krillyzer list layouts --contains=mak` (layouts that contain only the string "mak")
 
 ### load
@@ -27,9 +28,9 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 - `./krillyzer load eng/mt/200` (sets the corpus to monkeytype 200)
 - `./krillyzer load sometext.txt --file` (loads from the file "sometext.txt")
 
-### stats
-- `./krillyzer stats semimak` (shows the stats for the layout [semimak](https://semilin.github.io/posts/Semimak.html). It uses the default board defined in [config.txt](https://github.com/krillize/krillyzer/blob/master/config.txt))
-- `./krillyzer stats semimak --board=rowstag` (shows the stats for semimak with the rowstag board)
+### view
+- `./krillyzer view semimak` (shows the stats for the layout [semimak](https://semilin.github.io/posts/Semimak.html). It uses the default board defined in [config.txt](https://github.com/krillize/krillyzer/blob/master/config.txt))
+- `./krillyzer view semimak --board=rowstag` (shows the stats for semimak with the rowstag board)
 
 ### sfb 
 - `./krillyzer sfb qwerty` (shows the sfbs per finger and the top 16 most frequent sfbs
