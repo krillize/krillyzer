@@ -167,8 +167,14 @@ bool isAdjacentRoll(Position[] pos) {
 bool isRowRoll(Position[] pos) {
     return (
         pos.isRoll && (
-            pos[0 .. 2].sameRow ||
-            pos[1 .. 3].sameRow
+            (
+                pos[0 .. 2].sameRow &&
+                pos[0 .. 2].sameHand
+            ) ||
+            (
+                pos[1 .. 3].sameRow &&
+                pos[1 .. 3].sameHand
+            )
         )
     );
 }
