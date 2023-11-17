@@ -62,6 +62,7 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 
 # Todo
 ### potential features 
+- config option to throw away unknown ngrams
 - support for layers
 - color display
 - shai and "monkeyracer" corpus
