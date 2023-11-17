@@ -14,6 +14,7 @@ Usage:
   krillyzer   load    <corpus>                      [--file]
   krillyzer   view    <layout>                      [--board=<board>]
   krillyzer   sfb     <layout>                      [--dist] [--amount=<int>]
+  krillyzer   stat    <layout> <stat>               [--dist] [--amount=<int>]
   krillyzer   roll    <layout>                      [--relative]
   krillyzer   use     <layout>
   krillyzer   rank
@@ -234,6 +235,44 @@ void main(string[] args) {
 
 		writeln();
 		showUse(layout, data);
+	}
+
+	if (cmds["stat"].isTrue) {
+		auto raw = layout.getStats(data, cmds["--dist"].isTrue);
+		string stat = cmds["<stat>"].toString;
+
+		int amount = 16;
+		if (cmds["--amount"].isString) {
+			string str = cmds["--amount"].toString;
+			amount = str.parse!int;
+		}
+
+		if (!(stat in raw)) {
+			"Error: stat %s does not exist".writefln(stat);
+			return;
+		}
+
+		writeln(layout.name);
+		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+
+		"\n%s".writefln(stat.toUpper);
+		"  Freq  %6.3f%%".writefln(raw[stat].freq);
+
+		if (raw[stat].avgdist > 1) {
+			"  Dist  %6.3f%%".writefln(raw[stat].avgdist);
+			"  Total %6.3f%%".writefln(raw[stat].dist);
+		}
+		
+		"\nTop %s".writefln(amount);
+
+		foreach (row; raw[stat].top(amount).chunks(4)) {
+			foreach (gram; row) {
+				"  %s %-7s".writef(
+					gram, "%.3f%%".format(raw[stat].freq(gram))
+				);
+			}
+			writeln;
+		}
 	}
 
 	if (cmds["roll"].isTrue) {
