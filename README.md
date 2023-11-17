@@ -49,6 +49,16 @@ Krillyzer uses [docopt](http://docopt.org/) for its command line spec. In summar
 ### use 
 - `./krillyzer use mtgap` (shows the per finger use for mtgap)
 
+### find
+- `./krillyzer find sfb:l1 sfs:l7` (finds layouts with less than 1% sfb and 7% sfs)
+- `./krillyzer find inroll:g30` (finds layouts with greater than 30% inward rolls)
+- `./krillyzer find thumb:e0` (finds layouts without any thumb use)
+- `./krillyzer find sfb:l0.8 alt roll red one` (finds layouts with less than 0.8% sfb and include alt roll redirect and onehand stat columns)
+
+### sort
+- `./krillyzer sort sfb` (sorts all layouts by sfb frequency descending)
+- `./krillyzer sort inroll --asc` (sorts all layouts by inroll frequency ascending)
+
 ### rank
 - `./krillyzer rank` (ranks all layouts according to the [scoring algorithm](#scoring))
 
