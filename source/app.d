@@ -17,8 +17,9 @@ Usage:
   krillyzer   stat    <layout> <stat>               [--dist] [--amount=<int>]
   krillyzer   roll    <layout>                      [--relative]
   krillyzer   use     <layout>
-  krillyzer   rank
+  krillyzer   find    <filters>...
   krillyzer   sort    <stat>                        [--asc]
+  krillyzer   rank
   krillyzer   gen
   krillyzer   freq    <bigram>                      [--ignoreCase]
   krillyzer   debug   <layout> <bigram>             [--board=<board>]
@@ -355,7 +356,108 @@ void main(string[] args) {
 				"%-25s %6.3f%%".writefln(k, v);
 			}
 		}
+	}
 
+	if (cmds["find"].isTrue) {
+		auto filters = cmds["<filters>"].asList;
+
+		Stat[string] statlist = findLayout("qwerty", board).getStats(data);
+		foreach(f; filters) {
+			string[] tokens = f.splitter(":").array;
+			string stat = tokens[0];
+
+			if (!(stat in statlist)) {
+				"Error: stat %s does not exist".writefln(stat);
+				return;
+			}
+
+			if (tokens.length == 1) {
+				continue;
+			}
+
+			if (tokens[1].length == 0) {
+				"Error: no value to the right specified".writeln;
+				return;	
+			}
+
+			char comp = tokens[1][0];
+
+			if (!"lge".canFind(comp)) {
+				"Error: unrecognized comparison op \"%s\"".writefln(comp);
+				return;
+			}
+
+			try {
+				tokens[1][1 .. $].to!double;
+			} catch (ConvException e) {
+				"Error: unable to parse value for filter %s".writefln(stat);
+				return;
+			}
+		}
+
+		"%-25s".writef("Layouts");
+
+		foreach(f; filters) {
+			string[] tokens = f.splitter(":").array;
+			string stat = tokens[0];
+
+			if (tokens.length > 1) {
+				char comp = tokens[1][0];
+
+				if (comp == 'e') {
+					continue;
+				}
+			}
+
+			"%12s".writef(stat.toUpper);
+		}
+
+		writeln;
+
+		foreach (e; getLayouts(folders)) {
+			layout = e.getLayout(board);
+			Stat[string] stats = layout.getStats(data);
+
+			bool passes = true;
+			double[] res;
+
+			foreach(f; filters) {
+				string[] tokens = f.splitter(":").array;
+
+				string stat = tokens[0];
+
+				if (tokens.length == 1) {
+					res ~= stats[stat].freq;
+					continue;
+				} 
+
+				char comp = tokens[1][0];
+				double value = tokens[1][1 .. $].to!double;
+
+				if (
+					(comp == 'l' && stats[stat].freq > value) ||
+					(comp == 'g' && stats[stat].freq < value) ||
+					(comp == 'e' && stats[stat].freq != value)
+				) {
+					passes = false;
+					break;
+				}
+
+				if (comp != 'e') {
+					res ~= stats[stat].freq;
+				}
+			}
+
+			if (passes) {
+				"%-25s ".writef(layout.name);
+
+				foreach(val; res) {
+					"%10.2f%% ".writef(val);
+				}
+
+				writeln;
+			}
+		}
 	}
 
 	if (cmds["debug"].isTrue) {
