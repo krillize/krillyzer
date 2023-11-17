@@ -10,17 +10,17 @@ immutable string doc = "
 krillyzer
 
 Usage:
-  krillyzer   list    (layouts | corpora)   [--contains=<string>]             
-  krillyzer   load    <corpus>              [--file]
-  krillyzer   stats   <layout>              [--board=<board>]
-  krillyzer   sfb     <layout>              [--dist] [--amount=<int>]
-  krillyzer   roll    <layout>              [--relative]
+  krillyzer   list    (layouts | stats | corpora)   [--contains=<string>]             
+  krillyzer   load    <corpus>                      [--file]
+  krillyzer   view    <layout>                      [--board=<board>]
+  krillyzer   sfb     <layout>                      [--dist] [--amount=<int>]
+  krillyzer   roll    <layout>                      [--relative]
   krillyzer   use     <layout>
   krillyzer   rank
-  krillyzer   sort    <stat>                [--asc]
+  krillyzer   sort    <stat>                        [--asc]
   krillyzer   gen
-  krillyzer   freq    <bigram>              [--ignoreCase]
-  krillyzer   debug   <layout> <bigram>     [--board=<board>]
+  krillyzer   freq    <bigram>                      [--ignoreCase]
+  krillyzer   debug   <layout> <bigram>             [--board=<board>]
 ";
 
 void showUse(Layout layout, JSONValue data) {
@@ -172,6 +172,12 @@ void main(string[] args) {
 			msg = "List of Layouts:";
 		}
 
+		if (cmds["stats"].isTrue) {
+			layout = findLayout("qwerty", board);
+			items = layout.getStats(data, true).byKey.array;
+			msg = "List of Stats:";
+		}
+
 		if (cmds["--contains"].isString) {
 			string str = cmds["--contains"].toString;
 			items = items.filter!(x => x.canFind(str)).array;
@@ -194,7 +200,7 @@ void main(string[] args) {
 		generate();
 	}
 
-	if (cmds["stats"].isTrue) {
+	if (cmds["view"].isTrue) {
 		auto raw = layout.getStats(data, true);
 
 		writeln(layout.name);
