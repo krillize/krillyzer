@@ -2,7 +2,7 @@ name    dnb
 date    2022 08 30
 format  custom
 
-author  Kyrime
+author  Oxey
 
 main (
     q p d g w  z m o u ,
