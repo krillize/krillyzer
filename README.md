@@ -85,6 +85,7 @@ Currently, krillyzer uses a very crude scoring metric as a placeholder, simply s
 - add more stats
 - add colstag support
 - add generator features like config and trigram stats
+- search by finger/sfb/column
 
 ### potential stats
 - roll ratio
