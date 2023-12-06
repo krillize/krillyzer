@@ -156,7 +156,10 @@ Layout getLayout(string path, string boardname) {
                 ((finger - '0') > 4).to!Hand
             );
 
-            keys[ch] = pos;
+            if (!(ch in keys)) {
+                keys[ch] = pos;
+            }
+
 
             if (pos.finger == 4 || pos.finger == 5) {
                 layout.hasThumb = true;
