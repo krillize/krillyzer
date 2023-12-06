@@ -1,0 +1,32 @@
+name    Týr
+date    2023 07 15
+format  custom
+
+author  (
+	Flarefin
+	Smudge
+)
+
+main (
+	u o h r m
+	e a ~ t s
+	. , ' d l
+)
+
+L1 (
+	; p x f w
+	i b k n y
+	/ v j c g
+)
+
+L2 (
+	6 7 8 9 0
+	1 2 3 4 5
+	[ ] z q -
+)
+
+fingers (
+	0 1 2 3 3
+	0 1 2 3 3
+	0 1 2 3 3
+)

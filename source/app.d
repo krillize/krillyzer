@@ -306,8 +306,11 @@ void main(string[] args) {
 			amount = str.parse!int;
 		}
 
-		writeln(layout.name);
-		layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+		// writeln(layout.name);
+		// layout.main.splitter("\n").each!(x => "  %s".writefln(x));
+		// writeln();
+
+		layout.writeln;
 		writeln();
 
 		showSFB(layout, data, amount, cmds["--dist"].isTrue, true);

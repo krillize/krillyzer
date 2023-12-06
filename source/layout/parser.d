@@ -84,9 +84,16 @@ Layout getLayout(string path, string boardname) {
         data["shift"] = data["main"].map!(x => shifter.get(x, x)).to!string;
     }
 
-    enforce!ParserException(data["main"].length == data["shift"].length,
-        "mismatch in tokens between main and shift keys"
-    );
+    foreach (layer; ["shift", "L1", "L2", "L3"]) {
+        if (!(layer in data)) {
+            continue;
+        }
+
+        enforce!ParserException(data["main"].length == data[layer].length,
+            "mismatch in token length between main and layer %s".format(layer)
+        );
+    }
+
 
     Layout layout;
 
@@ -97,10 +104,10 @@ Layout getLayout(string path, string boardname) {
 
     layout.name = data["name"];
     layout.format = data["format"];
-    layout.main = data["main"];
 
-    int row;
-    int col;
+    layout.main = ["main", "L1", "L2", "L3"]
+        .filter!(x => x in data)
+        .map!(x => data[x]).join("\n\n");
 
     double[] roff = [0];
     double[] coff = [0];
@@ -114,39 +121,46 @@ Layout getLayout(string path, string boardname) {
     }
 
     Position[dchar] keys;
-    foreach (ch, sh, finger; zip(data["main"], data["shift"], data["fingers"])) {
-        if (ch == '\n') {
-            row++;
-            col = 0;
+
+    foreach (i, layer; ["main", "shift", "L1", "L2", "L3"]) {
+        if (!(layer in data)) {
             continue;
         }
 
-        if (ch == ' ') {
-            col++;
-            continue;
-        }
+        int row;
+        int col;
 
-        if (ch == '~') {
-            continue;
-        }
+        foreach (ch, finger; zip(data[layer], data["fingers"])) {
+            if (ch == '\n') {
+                row++;
+                col = 0;
+                continue;
+            }
 
-        Position pos = Position(
-            row,
-            col,
-            row + coff[min(row, coff.length.to!int - 1)],
-            col + roff[min(row, roff.length.to!int - 1)],
-            (finger - '0').to!Finger,
-            ((finger - '0') > 4).to!Hand
-        );
+            if (ch == ' ') {
+                col++;
+                continue;
+            }
 
-        keys[ch] = pos;
+            if (ch == '~') {
+                continue;
+            }
 
-        if (!layout.main.canFind(sh)) {
-            keys[sh] = pos;
-        }
+            Position pos = Position(
+                row,
+                col,
+                i.to!int,
+                row + coff[min(row, coff.length.to!int - 1)],
+                col + roff[min(row, roff.length.to!int - 1)],
+                (finger - '0').to!Finger,
+                ((finger - '0') > 4).to!Hand
+            );
 
-        if (pos.finger == 4 || pos.finger == 5) {
-            layout.hasThumb = true;
+            keys[ch] = pos;
+
+            if (pos.finger == 4 || pos.finger == 5) {
+                layout.hasThumb = true;
+            }
         }
     }
 

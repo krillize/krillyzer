@@ -9,6 +9,7 @@ enum Row    {top, home, bottom}
 struct Position {
     int row;
     int col;
+    int layer;
 
     double x;
     double y;
@@ -18,12 +19,12 @@ struct Position {
 
     string toString() const @safe pure {
         if (row == x && col == y) {
-            return "F=%s, (%s, %s)".format(
-                finger, row, col
+            return "F=%s, L=%s, (%s, %s)".format(
+                finger, layer, row, col
             );
         } else {
-            return "F=%s, (%s, %s) => (%s, %s)".format(
-                finger, row, col, x, y
+            return "F=%s, L=%s, (%s, %s) => (%s, %s)".format(
+                finger, layer, row, col, x, y
             );
         }
     }
@@ -47,5 +48,12 @@ struct Layout {
         this.keys[b] = temp;
 
         this.main = this.main.map!(x => [a: b, b: a].get(x, x)).to!string;
+    }
+
+    string toString() const {
+        return (
+            name ~ "\n" ~
+            main.splitter("\n").map!(x => "  %s".format(x)).join("\n")
+        );
     }
 }
